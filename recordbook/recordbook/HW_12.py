@@ -2,7 +2,8 @@
 from pathlib import Path
 import os, sys
 import platform  # для clearscrean()
-from RecordBook import AddressBook, Record, Name, Phone, Field, Birthday, PhoneException, BirthdayException
+from RecordBook import AddressBook, Record, Name, Phone, Field, Birthday, PhoneException, BirthdayException, EmailException
+from clean import sort_main
 from note_book import NoteBook, NoteRecord, Note, Tag
 from datetime import datetime
 import re
@@ -46,7 +47,8 @@ def main():
                      "show book", "change birthday", "birthday", "search", 
                      "close", "exit", "good bye", 
                      "show all", "hello", "cls", "help", 
-                     "note add", "note change", "note del", "note find", "note show", "note sort"]: result = handler(prm)
+                     "note add", "note change", "note del", 
+                     "note find", "note show", "note sort", "sort"]: result = handler(prm)
         elif cmd in ["save", "load"]: result = handler(path_book)     
         
         # 4. Завершення роботи програми
@@ -68,6 +70,8 @@ def input_error(func):
         except BirthdayException as e:
             print(e)
         except PhoneException as e:
+            print(e)
+        except EmailException as e:
             print(e)
         except FileNotFoundError:    # Файл бази даних Відсутній
             print("The database isn't found")
@@ -220,7 +224,7 @@ def func_add_rec(prm):
             rec = Record(name=new_name, birthday=new_birthday, phones=lst_phones)
             book.add_record(rec)
             
-            return "1 record was successfully added - [bold green]success[/bold greeens]"
+            return "1 record was successfully added - [bold green]success[/bold green]"
         else: return "The person is already in database"  # Повернемо помилку -> "Неможливо дадати існуючу людину"
     else:
         return f"Expected 3 arguments, but {count_prm} was given.\nHer's an example >> add Mike 02.10.1990 +380504995876"
@@ -481,6 +485,21 @@ def  func_search(prm):
     else: return f"Expected 1 arguments, but {count_prm} was given.\nHer's an example >> search Mike"
     
     
+# =========================================================
+# >> sort    Done
+# функція викликає модул cleanfolder виконує сортування файлів у вказаній папці
+#              example >> sort Testfolder
+#                      >> sort C://Testfolder/testfolder
+#                      >> sort .Testfolder/testfolder
+# =========================================================
+@input_error
+def func_sort(prm):
+    if prm[0] == "":
+        return f"[bold yellow]Enter path[/bold yellow]"
+    return sort_main(prm)
+    # return f"[bold green]Sort {prm} finished:[/bold green]"
+    
+    
 #=========================================================
 # Функція читає базу даних з файлу - ОК
 #========================================================= 
@@ -559,6 +578,8 @@ def func_help(_):
       example >> [bold blue]note show /10[/bold blue]
 [bold red]note sort[/bold red] - здійснює сортування записів нотаток за тегами
       example >> [bold blue]note sort /10[/bold blue]      
+[bold red]sort[/bold red] - виконує сортування файлів в указаній папці
+      example >> [bold blue]sort folder_name[/bold blue]
 """
     
 @input_error
@@ -584,7 +605,7 @@ COMMANDS = ["good bye", "close", "exit",
             "hello", "add", "phone", "show all", "save", "load", 
             "cls", "add phone", "del phone", "change phone", "show book",
             "change birthday", "birthday", "help", "search",
-            "note add", "note del", "note change", "note find", "note show", "note sort"]
+            "note add", "note del", "note change", "note find", "note show", "note sort", "sort"]
 
 OPERATIONS = {"good bye": func_exit, "close": func_exit, "exit": func_exit,
               "hello": func_greeting, 
@@ -607,7 +628,8 @@ OPERATIONS = {"good bye": func_exit, "close": func_exit, "exit": func_exit,
               "note change": note_change,
               "note find": note_find,
               "note show": note_show,
-              "note sort": note_sort}
+              "note sort": note_sort, 
+              "sort": func_sort}
 
 if __name__ == "__main__":
     main()
