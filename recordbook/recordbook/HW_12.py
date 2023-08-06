@@ -181,16 +181,17 @@ def note_show(args):
 # example >> note sort
 #=========================================================
 @input_error
-def note_sort():
+def note_sort(args):
     if not len(note_book.data): 
         return f"Notebook is empty"
     result = []
     for rec in note_book.values():
-        line = f"\n{rec.tag} {rec.note} {rec.key}"
+        line = f"{rec.tag} {rec.note} {rec.key}"
         result.append(line)
     result.sort()
-                
-    return result
+    for i, t in enumerate(result, 1):
+        print(i)           
+    return ""
 
 
 #=========================================================
