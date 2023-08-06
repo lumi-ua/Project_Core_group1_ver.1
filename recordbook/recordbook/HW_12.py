@@ -21,9 +21,7 @@ book = AddressBook()
 note_book = NoteBook()
 
 # Головна функція роботи CLI(Command Line Interface - консольного скрипту) 
-def main():
-    #absolute_path = os.path.abspath(sys.argv[0])
-    #path = Path(sys.path[0]).joinpath(n)
+def main():    
     note_book.load_data(path_note)
     cmd = ""
     clear_screen("")
@@ -79,6 +77,8 @@ def input_error(func):
             print("Record isn't in the database")
         except KeyboardInterrupt:
             func_exit(_)
+        except TypeError:
+            print("Incorect data")
     return inner
 
 
@@ -97,7 +97,7 @@ def get_handler(operator):
 def note_add(args):
     if args.rfind("#"):
         n = args.rfind("#")  
-    key = datetime.now().replace(microsecond=0).timestamp()
+    key = str(datetime.now().replace(microsecond=0).timestamp())
     note = Note(args[:n].strip())
     tag = Tag(args[n:]) 
     record = NoteRecord(key, note, tag)
@@ -111,13 +111,12 @@ def note_add(args):
 @input_error
 def note_del(args):
     key = args.strip()
+    rec : NoteRecord = note_book.get(key)
     try:
-        rec = note_book.pop(key)
+        return note_book.del_record(rec)
     except KeyError:
         return f"Record {key} does not exist."
-    
-    return f"Record {rec} deleted."
-    
+            
 
 #=========================================================
 # >> note change <key-record> <New notes> <tag>
@@ -126,17 +125,22 @@ def note_del(args):
 @input_error
 def note_change(args):
     n = args.find(" ")
-    key = args[:n]
+    key = args[:n]    
     m = args.rfind("#")
     if m == -1: 
         note = Note(args[n+1:])
-        tag = Tag("#None")
-    else: 
+        tag = None
+    if len(args[n:m]) == 1: 
+        note = None
+        tag = Tag(args[m:])
+    else:
         note = Note(args[n+1:m])
         tag = Tag(args[m:])
     rec : NoteRecord = note_book.get(key)
     if rec:
-        return rec.change_note(rec.note.value, note, tag)
+        return rec.change_note(rec.note.value, note if note else rec.note.value, tag if tag else rec.tag.value)
+    else:
+        return f"Record does not exist"
     
 
 #=========================================================
@@ -156,14 +160,38 @@ def note_find(args):
 #=========================================================
 @input_error
 def note_show(args):
-    if not len(note_book.data): return f"Notebook is empty"
-    for page, rec in enumerate(note_book.iterator(int(args)), 1):
-        print(f"Page {page}")
-        print(str(rec))
-        input("For next page press enter")
+    if args.startswith("/") and args[1:].isdigit():
+        args = int(args[1:])
+    else:
+        args = 5
+    if not len(note_book.data): 
+        return f"Notebook is empty"
+    for page, rec in enumerate(note_book.iterator(args), 1):
+        print(f"Page {page}\n")
+        for item in rec:
+            print(f"{item}")
+        
+        input("\nFor next page press enter")
     return ""
 
+
 #=========================================================
+# >> note sort
+# Сортування нотаток по тегу
+# example >> note sort
+#=========================================================
+@input_error
+def note_sort():
+    if not len(note_book.data): 
+        return f"Notebook is empty"
+    result = {}
+    for rec in note_book.values():
+        if result.get(rec.note):
+            result.
+        else:
+            result.update({rec.note: [rec]})
+                
+    return result
 
 
 #=========================================================

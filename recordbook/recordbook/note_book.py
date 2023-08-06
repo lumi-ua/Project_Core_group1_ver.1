@@ -25,9 +25,12 @@ class Tag:
 class Note(Tag):
     pass
 
+class Key(Tag):
+    pass
+
 class NoteRecord():    
     def __init__(self, key: str, note: Note=None, tag: Tag=None):        
-        self.key = str(datetime.now().replace(microsecond=0).timestamp())
+        self.key = key
         self.note = note
         self.tag = tag
 
@@ -42,24 +45,24 @@ class NoteRecord():
         return f"Note {note} added."
 
     def del_note(self, note):
-        self.note = None
-        return f"Note {note} deleted"
+        if note == self.note:
+            self.note = None
+        return f"Record Note {note} deleted"
 
     def change_note(self, old_note: Note, new_note: Note, tag: Tag):
         self.del_note(old_note)
         self.add_note(new_note)
-        self.tag = tag
-        #return f"Note {old_note} was replaced by {new_note} with tag {self.tag}"
-        return f"\nDeleted note: {old_note}\nNew note: {new_note}\nNew Tag: {self.tag}"
+        self.tag = tag        
+        return f"\nDeleted note: {old_note}\nNew note: {new_note}\nNew Tag: {self.tag}\n"
 
 class NoteBook(UserDict):
     def add_record(self, record: NoteRecord):
         self.data[record.key] = record
-        return f"Added new record {record}"
+        return f"\nAdded new record\nwith key: {record.key}\nNote: {record.note}\nTag: {record.tag}\n"
     
     def del_record(self, record: NoteRecord):
-        result = self.data.pop[record.key]
-        return f"Record {result} deleted"
+        result = self.data.pop(record.key)
+        return f"\nDeleted record \nwith key: {result.key}\nNote: {result.note}\nTag: {result.tag}\n"
         
     def iterator(self, group_size=15):
         records = list(self.data.values())
