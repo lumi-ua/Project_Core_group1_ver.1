@@ -3,6 +3,8 @@ from pathlib import Path
 import os, sys
 import platform  # для clearscrean()
 from RecordBook import AddressBook, Record, Name, Phone, Field, Birthday, PhoneException, BirthdayException
+from note_book import NoteBook, NoteRecord, Note, Tag
+from datetime import datetime
 import re
 
 from rich import print
@@ -13,10 +15,15 @@ from rich.console import Console
 # Получаем абсолютный путь к запущенной программе
 absolute_path = os.path.abspath(sys.argv[0])
 path = Path(sys.path[0]).joinpath("data_12.bin")
+# Файл збереження нотаток
+n_book_filename = "n_book.json"
+
 book = AddressBook()
+note_book = NoteBook()
 
 # Головна функція роботи CLI(Command Line Interface - консольного скрипту) 
 def main():
+    note_book.load_data(n_book_filename)
     cmd = ""
     clear_screen("")
     print("[bold white]CLI version 12.0[/bold white]")  
@@ -74,6 +81,75 @@ def input_error(func):
 # Повертає адресу функції, що обробляє команду користувача
 def get_handler(operator):
     return OPERATIONS[operator]    
+
+
+#=========================================================
+# Блок функцій для роботи з нотатками
+#=========================================================
+# >> note add <текст нотатки будь-якої довжини> <teg-ключове слово> 
+# example >> note add My first note in this bot. Note
+#=========================================================
+@input_error
+def note_add(*args):
+    key = datetime.now().replace(microsecond=0).timestamp()
+    note = Note(" ".join(args[:-1]))
+    tag = Tag(args[-1])
+    record = NoteRecord(key, note, tag)
+    return note_book.add_record(record)
+
+
+#=========================================================
+# >> note del <key-ідентифікатор запису>
+# example >> note del 1691245959.0
+#=========================================================
+@input_error
+def note_del(*args):
+    key = args[0]
+    try:
+        rec = note_book.pop(key)
+    except KeyError:
+        return f"Record {key} does not exist."
+    
+    return f"Record {rec} deleted."
+    
+
+#=========================================================
+# >> note change <key-record> <New notes> <tag>
+# example >> note change 1691245959.0 My new notes. New
+#=========================================================
+@input_error
+def note_change(*args):
+    key = args[0]
+    note = Note(" ".join(args[1:-1]))
+    tag = Tag(args[-1])
+    rec : NoteRecord = note_book.get(key)
+    if rec:
+        return rec.change_note(rec.note.value, note, tag)
+    
+
+#=========================================================
+# >> note find <fragment>
+# Фрагмент має бути однією фразою без пробілів
+# example >> note find word
+#=========================================================
+@input_error
+def note_find(*args):
+    return note_book.find_note(args[0])
+
+
+#=========================================================
+# >> note show <int: необов'язковий аргумент кількості рядків>
+# Передається необов'язковий аргумент кількості рядків 
+# example >> note show 15
+#=========================================================
+@input_error
+def note_show(*args):
+    for page, rec in enumerate(note_book.iterator(6), 1):
+        print(f"Page {page}")
+        print(str(rec))
+        input("For next page press enter")
+
+#=========================================================
 
 
 #=========================================================
@@ -196,6 +272,7 @@ def func_change_phone(prm):
 #=========================================================
 @input_error
 def func_exit(_):
+    note_book.save_data(n_book_filename)
     return "Good bye!"
 
 
@@ -429,6 +506,16 @@ def func_help(_):
       example >> [bold blue]change birthday Mike 02.03.1990[/bold blue]
 [bold red]search[/bold red] - виконує пошук інформації по довідковій книзі
       example >> [bold blue]search Mike[/bold blue]
+[bold red]note add[/bold red] - додає нотатку з тегом у записник нотаток
+      example >> [bold blue]note add My first note Note[/bold blue]
+[bold red]note del[/bold red] - видаляє нотатку за ключем із записника нотаток
+      example >> [bold blue]note del 1691245959.0[/bold blue]
+[bold red]note change[/bold red] - змінює нотатку з тегом за ключем у записнику нотаток
+      example >> [bold blue]note change 1691245959.0 My first note Note[/bold blue]
+[bold red]note find[/bold red] - здійснює пошук за фрагментом у записнику нотаток
+      example >> [bold blue]note find name[/bold blue]
+[bold red]note show[/bold red] - здійснює посторінковий вивід всіх нотаток
+      example >> [bold blue]note show 10[/bold blue]
 """
     
 @input_error
@@ -453,7 +540,8 @@ def get_count_prm(prm: list):
 COMMANDS = ["good bye", "close", "exit",
             "hello", "add", "phone", "show all", "save", "load", 
             "cls", "add phone", "del phone", "change phone", "show book",
-            "change birthday", "birthday", "help", "search"]
+            "change birthday", "birthday", "help", "search",
+            "note add", "note del", "note change", "note find", "note show", ]
 
 OPERATIONS = {"good bye": func_exit, "close": func_exit, "exit": func_exit,
               "hello": func_greeting, 
@@ -470,7 +558,12 @@ OPERATIONS = {"good bye": func_exit, "close": func_exit, "exit": func_exit,
               "change birthday": func_change_birthday,
               "birthday": func_get_day_birthday,
               "help": func_help,
-              "search": func_search}
+              "search": func_search,
+              "note add": note_add,
+              "note del": note_del,
+              "note change": note_change,
+              "note find": note_find,
+              "note show": note_show}
 
 if __name__ == "__main__":
     main()
