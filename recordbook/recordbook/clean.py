@@ -1,7 +1,22 @@
-import sys
+"""
+Питання: 
+1. 
+2. 
+
+Зміни: 
+1. Таблиця печатає розширення файлів тепер без крапок
+2. Змінив розташування файлу результатів роботи Sort. Тепер файл там де main.py
+3. Файл Sort_Log.txt - шапку таблиці друкує НЕ вірно: расширения переносит на другую  строку 
+   Extensions: tar, zip 
+   Виправив - def save_log(list):
+   
+"""
+
+import sys, os
 from pathlib import Path
 import uuid
 import shutil
+import re
 
 EXCEPTION = ["Audio", "Documents", "Images", "Video", "Archives", "Other"]
 
@@ -99,7 +114,8 @@ def file_list():
         for element in value[0]:
             if len(element) > len(longest_element):
                 longest_element = element
-        ext = "Extensions: " + ", ".join(value[1])
+              
+        ext = "Extensions: " + ", ".join(value[1]) 
         if len(ext) > len(longest_element):
             longest_element = ext
 
@@ -111,7 +127,7 @@ def file_list():
         lst.append("|" + "=" * oll_length + "|")
         ext = "Extensions: "
         for extension in value[1]:
-            ext += extension + ", "
+            ext += re.sub("\.", "", extension) + ", "
         ext = ext[:-2]
         lst.append("|{:<{length}}|".format(ext, length=oll_length))
         lst.append("|" + "-" * oll_length + "|")
@@ -141,7 +157,7 @@ def move_file(file: Path, root_dir: Path, categorie: str) -> None:
     global dict_search_result
     target_dir = root_dir.joinpath(categorie)
     if not target_dir.exists():
-        print(f"Creation {target_dir}")
+        # print(f"Creation {target_dir}") # друкує теку яку сортуємо
         target_dir.mkdir()
 
     if file.suffix.lower() in (".zip", ".tar", ".gz"):
@@ -182,20 +198,16 @@ def sort_folder(path: Path) -> None:
 
 
 def save_log(list):
-    with open("Sort_Log.txt", "w") as file:
-        for item in list:
-            items = item.split(", ")
-            for element in items:
-                file.write(f"{element}\n")
+    absolute_path = os.path.abspath(sys.argv[0])
+    path = Path(sys.path[0]).joinpath("Sort_Log.txt")
+    with open(path, "w") as file:
+        file.writelines(str(item) + "\n" for item in list)
 
 
-
-def main(argv):
+# =========================================
+def sort_main(argv):
     try:
         path = Path(argv)
-        # path = Path(sys.argv[1])
-        # path = Path("C:\\Testfolder")
-        print(f"Folder for sorting ", {path})
     except IndexError:
         return "No folder specified for sorting"
 
@@ -207,10 +219,8 @@ def main(argv):
     delete_arch_files(path)
     # file_list()
     save_log(file_list())
-
-
-    return f"The folder {path} is sorted."
+    return f"The folder {path} is sorted - [bold green]success[/bold green]"
 
 
 if __name__ == "__main__":
-    print(main())
+    print(sort_main())
