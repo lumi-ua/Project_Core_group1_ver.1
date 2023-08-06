@@ -190,7 +190,7 @@ def note_sort(args):
         return f"Notebook is empty"
     result = []
     for rec in note_book.values():
-        line = f"{rec.tag} {rec.note} {rec.key}"
+        line = f"{rec.tag}  {rec.note}  {rec.key}"
         result.append(line)
     result.sort()
     count = 0
@@ -198,7 +198,7 @@ def note_sort(args):
         print(item)
         count += 1
         if count == 5:
-            input("\nFor next page press enter")
+            input("\nFor next page press enter\n")
             count = 0
     return ""
 
