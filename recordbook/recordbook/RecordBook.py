@@ -11,11 +11,19 @@ class Field():
         self.__value = None
         self.value = value
     
+    @property
+    def value(self):
+        return self.__value
+    
+    @value.setter
+    def value(self, value):
+        self.__value = value
+
     def __str__(self) -> str:
         return self.value
     
     def __repr__(self) -> str:
-        return str(self)
+        return str(self.value)
     
 # клас Ім'я
 class Name(Field):
@@ -24,8 +32,8 @@ class Name(Field):
         return self.__value
     
     @value.setter
-    def value(self, new_value):
-        self.__value = new_value
+    def value(self, value):
+        self.__value = value
 
   
 # клас Телефон
@@ -59,14 +67,14 @@ class Birthday(Field):
         return self.__value
     
     @value.setter
-    def value(self, new_birthday:str):
-        pattern = r"^\d{2}(\.|\-|\/)\d{2}\1\d{4}$"  # дозволені дати формату DD.MM.YYYY 
-        if re.match(pattern, new_birthday):         # альтернатива для крапки: "-" "/"
-            self.__value = re.sub("[-/]", ".", new_birthday)  # комбінувати символи ЗАБОРОНЕНО DD.MM-YYYY 
-        else: 
+    def value(self, value:str):
+        print(value)
+        if value.lower() == "none": 
             self.__value = "None"
-            # raise BirthdayException("Unauthorized birthday format")
-
+        else:
+            pattern = r"^\d{2}(\.|\-|\/)\d{2}\1\d{4}$"  # дозволені дати формату DD.MM.YYYY 
+            if re.match(pattern, value):         # альтернатива для крапки: "-" "/"
+                self.__value = re.sub("[-/]", ".", value)  # комбінувати символи ЗАБОРОНЕНО DD.MM-YYYY 
 
 class Address(Field):
     @property
@@ -85,13 +93,15 @@ class Email(Field):
     
     @value.setter
     def value(self, value: str):
-        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-        # pattern = r"[a-zA-Z]{1}[a-zA-Z0-9._]{1,}@[a-zA-Z]+\.[a-zA-Z]{2,}"
-        if not re.match(pattern, value):
-            raise EmailException("Invalid email address!")
+        if value.lower() == "none": 
+            self.__value = "None"
         else:
-            self.__value = value 
-
+            pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+            if not re.match(pattern, value):
+                raise EmailException("Invalid email address!")
+            else:
+                self.__value = value 
+    
         
 #========================================================
 # Класс Record, который отвечает за логику 
@@ -111,11 +121,14 @@ class Record():
 # =========================================[ add ]======================================================
 # ======================================================================================================
 
+    def add_to_birthday(self, birthday:Birthday):
+        self.birthday = birthday
+
     def add_email(self, email:Email) -> None: 
-        self.email = email
+        self.email.value = email.value
 
     def add_address(self, address:Address) -> None: 
-        self.address = ' '.join(address)
+        self.address.value = ' '.join(address)
 
 # ======================================================================================================
 # =========================================[ remove ]===================================================
