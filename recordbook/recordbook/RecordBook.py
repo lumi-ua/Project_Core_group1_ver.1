@@ -134,13 +134,14 @@ class Record():
 # =========================================[ remove ]===================================================
 # ======================================================================================================
 
-    def remove_phone(self, phones:Phone) -> str:
+    def remove_phone(self, phones:Phone, bool=True) -> str:
         if len(self.phones) == 0: return "This contact has no phone numbers saved"
         
         for n in self.phones:
             if n.value == phones.value:
-                if len(self.phones) == 1:
-                    self.add_phone(Phone("None"))
+                if bool:
+                    if len(self.phones) == 1:
+                        self.add_phone(Phone("None"))
                 self.phones.remove(n)
                 return phones
 
@@ -163,7 +164,7 @@ class Record():
     def change_phone(self, old_phone:Phone, new_phone:Phone) -> str:
         for phones in self.phones:
             if str(old_phone) == str(phones):
-                self.remove_phone(old_phone)
+                self.remove_phone(old_phone, False)
                 self.add_phone(new_phone)
                 return f"Phone {old_phone} change to {new_phone} for {self.name} contact "
         return f"Phone {old_phone} for contact {self.name} doesn`t exist"
