@@ -136,19 +136,22 @@ class Record():
 
     def remove_phone(self, phones:Phone) -> str:
         if len(self.phones) == 0: return "This contact has no phone numbers saved"
+        
         for n in self.phones:
-            if n.value == phones.value: 
+            if n.value == phones.value:
+                if len(self.phones) == 1:
+                    self.add_phone(Phone("None"))
                 self.phones.remove(n)
                 return phones
 
     def remove_birthday(self, birthday:Birthday) -> None:
-        if self.birthday.value == birthday.value: self.birthday = None
+        if self.birthday.value == birthday.value: self.birthday.value = "None"
 
     def remove_email(self, email:Email) -> None: 
-        if self.email.value == email.value: self.email = None
+        if self.email.value == email.value: self.email.value = "None"
 
     def remove_address(self) -> None: 
-        self.address = None
+        self.address.value = "None"
 
 # ======================================================================================================
 # =========================================[ change ]===================================================
