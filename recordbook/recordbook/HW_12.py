@@ -102,7 +102,7 @@ def func_add_rec(prm):
             rec = Record(name=new_name, birthday=new_birthday, phones=lst_phones)
             book.add_record(rec)
             
-            return "1 record was successfully added - [bold green]success[/bold greeens]"
+            return "1 record was successfully added - [bold green]success[/bold green]"
         else: return "The person is already in database"  # Повернемо помилку -> "Неможливо дадати існуючу людину"
     else:
         return f"Expected 3 arguments, but {count_prm} was given.\nHer's an example >> add Mike 02.10.1990 +380504995876"
