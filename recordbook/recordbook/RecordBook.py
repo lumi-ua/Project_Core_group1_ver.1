@@ -36,17 +36,21 @@ class Phone(Field):
             self.__value = "None"
             return ""   # не видаляти
         
-        result = re.sub("\D", "", new_value) # \D - Matches any character which is not a decimal digit. 
-        if not result:
-            raise PhoneException("Incorrect phone format")   # введені символи замість телефона
-        
-        if len(result) == 12 and result.startswith("38"): self.__value = f"+{result}"
-        elif len(result) == 10 and result[:3] in ["093", "073", "063",\
-                                                "050", "066", "099", "095", "097", "067",\
-                                                "039", "068", "096", "098"]: self.__value = f"+38{result}"
-        elif len(result) != 12: 
-            raise PhoneException("Incorrect phone format")   # невірний формат телефона
+        if new_value:
+            correct_phone = ""
+            for i in new_value: 
+                if i in "+0123456789": correct_phone += i
+
+            if len(correct_phone) == 13: self.__value = correct_phone # "+380123456789"
+            elif len(correct_phone) == 12: self.__value = "+" + correct_phone # "380123456789"
+            elif len(correct_phone) == 10: self.__value = "+38" + correct_phone # "0123456789"
+            elif len(correct_phone) == 9: self.__value = "+380" + correct_phone # "123456789"
+            else: raise PhoneException("Incorrect phone format")   # невірний формат телефона
+
     
+
+            
+
     
 # клас День народження        
 class Birthday(Field):
@@ -62,6 +66,31 @@ class Birthday(Field):
         else: 
             self.__value = "None"
             # raise BirthdayException("Unauthorized birthday format")
+
+class Address(Field):
+    @property
+    def value(self):
+        return self.__value
+    
+    @value.setter
+    def value(self, new_value):
+        self.__value = new_value
+
+  
+
+class Email(Field):
+    @property
+    def value(self):
+        return self.__value
+    
+    @value.setter
+    def value(self, value: str):
+        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(pattern, value):
+            raise EmailException("Invalid email address!")
+        else:
+            self.__value = value 
+
             
       
         
@@ -183,6 +212,14 @@ class PhoneException(Exception):
 
 
 class BirthdayException(Exception):
+    def __init__(self, message):
+        self.__message = None
+        self.message = message
+    
+    def __str__(self):
+        return f"Attention: {self.message}"
+
+class EmailException(Exception):
     def __init__(self, message):
         self.__message = None
         self.message = message

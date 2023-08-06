@@ -2,7 +2,7 @@
 from pathlib import Path
 import os, sys
 import platform  # для clearscrean()
-from RecordBook import AddressBook, Record, Name, Phone, Field, Birthday, PhoneException, BirthdayException
+from RecordBook import AddressBook, Record, Name, Phone, Field, Birthday, PhoneException, BirthdayException, EmailException
 from clean import sort_main
 import re
 
@@ -62,6 +62,8 @@ def input_error(func):
         except BirthdayException as e:
             print(e)
         except PhoneException as e:
+            print(e)
+        except EmailException as e:
             print(e)
         except FileNotFoundError:    # Файл бази даних Відсутній
             print("The database isn't found")
