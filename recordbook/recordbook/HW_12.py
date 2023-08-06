@@ -14,16 +14,17 @@ from rich.console import Console
 
 # Получаем абсолютный путь к запущенной программе
 absolute_path = os.path.abspath(sys.argv[0])
-path = Path(sys.path[0]).joinpath("data_12.bin")
-# Файл збереження нотаток
-n_book_filename = "n_book.json"
+path_book = Path(sys.path[0]).joinpath("data_12.bin")
+path_note = Path(sys.path[0]).joinpath("n_book.json")
 
 book = AddressBook()
 note_book = NoteBook()
 
 # Головна функція роботи CLI(Command Line Interface - консольного скрипту) 
 def main():
-    note_book.load_data(n_book_filename)
+    #absolute_path = os.path.abspath(sys.argv[0])
+    #path = Path(sys.path[0]).joinpath(n)
+    note_book.load_data(path_note)
     cmd = ""
     clear_screen("")
     print("[bold white]CLI version 12.0[/bold white]")  
@@ -46,8 +47,9 @@ def main():
         if cmd in ["add", "phone", "add phone", "del phone", "change phone",
                      "show book", "change birthday", "birthday", "search", 
                      "close", "exit", "good bye", 
-                     "show all", "hello", "cls", "help"]: result = handler(prm)
-        elif cmd in ["save", "load"]: result = handler(path)     
+                     "show all", "hello", "cls", "help", 
+                     "note add", "note change", "note del", "note find", "note show"]: result = handler(prm)
+        elif cmd in ["save", "load"]: result = handler(path_book)     
         
         # 4. Завершення роботи програми
         if result == "Good bye!":
@@ -75,6 +77,8 @@ def input_error(func):
             print("Incorect data or unsupported format while writing to the file")
         except KeyError:
             print("Record isn't in the database")
+        except KeyboardInterrupt:
+            func_exit(_)
     return inner
 
 
@@ -87,13 +91,15 @@ def get_handler(operator):
 # Блок функцій для роботи з нотатками
 #=========================================================
 # >> note add <текст нотатки будь-якої довжини> <teg-ключове слово> 
-# example >> note add My first note in this bot. Note
+# example >> note add My first note in this bot. #Note
 #=========================================================
 @input_error
-def note_add(*args):
+def note_add(args):
+    if args.rfind("#"):
+        n = args.rfind("#")  
     key = datetime.now().replace(microsecond=0).timestamp()
-    note = Note(" ".join(args[:-1]))
-    tag = Tag(args[-1])
+    note = Note(args[:n].strip())
+    tag = Tag(args[n:]) 
     record = NoteRecord(key, note, tag)
     return note_book.add_record(record)
 
@@ -103,8 +109,8 @@ def note_add(*args):
 # example >> note del 1691245959.0
 #=========================================================
 @input_error
-def note_del(*args):
-    key = args[0]
+def note_del(args):
+    key = args.strip()
     try:
         rec = note_book.pop(key)
     except KeyError:
@@ -115,13 +121,19 @@ def note_del(*args):
 
 #=========================================================
 # >> note change <key-record> <New notes> <tag>
-# example >> note change 1691245959.0 My new notes. New
+# example >> note change 1691245959.0 My new notes. #Tag 
 #=========================================================
 @input_error
-def note_change(*args):
-    key = args[0]
-    note = Note(" ".join(args[1:-1]))
-    tag = Tag(args[-1])
+def note_change(args):
+    n = args.find(" ")
+    key = args[:n]
+    m = args.rfind("#")
+    if m == -1: 
+        note = Note(args[n+1:])
+        tag = Tag("#None")
+    else: 
+        note = Note(args[n+1:m])
+        tag = Tag(args[m:])
     rec : NoteRecord = note_book.get(key)
     if rec:
         return rec.change_note(rec.note.value, note, tag)
@@ -133,8 +145,8 @@ def note_change(*args):
 # example >> note find word
 #=========================================================
 @input_error
-def note_find(*args):
-    return note_book.find_note(args[0])
+def note_find(args):
+    return note_book.find_note(args)
 
 
 #=========================================================
@@ -143,11 +155,13 @@ def note_find(*args):
 # example >> note show 15
 #=========================================================
 @input_error
-def note_show(*args):
-    for page, rec in enumerate(note_book.iterator(6), 1):
+def note_show(args):
+    if not len(note_book.data): return f"Notebook is empty"
+    for page, rec in enumerate(note_book.iterator(int(args)), 1):
         print(f"Page {page}")
         print(str(rec))
         input("For next page press enter")
+    return ""
 
 #=========================================================
 
@@ -272,7 +286,7 @@ def func_change_phone(prm):
 #=========================================================
 @input_error
 def func_exit(_):
-    note_book.save_data(n_book_filename)
+    note_book.save_data(path_note)
     return "Good bye!"
 
 
@@ -453,8 +467,7 @@ def load_phoneDB(path):
 #========================================================= 
 @input_error
 def save_phoneDB(path):
-    return book.save_database(path)
-    #return book.save_database(book, path)
+    return book.save_database(path_book)
     
     
 #=========================================================

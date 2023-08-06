@@ -32,10 +32,10 @@ class NoteRecord():
         self.tag = tag
 
     def __str__(self):
-        return f"{str(self.key)}  {str(self.note if self.note else '')}  {str(self.tag if self.tag else '')}"
+        return f"{str(self.key)} {str(self.note if self.note else '')} {str(self.tag if self.tag else '')}"
     
     def __repr__(self):
-        return f"{str(self.key)}  {str(self.note if self.note else '')}  {str(self.tag if self.tag else '')}"
+        return f"{str(self.key)} {str(self.note if self.note else '')} {str(self.tag if self.tag else '')}"
                 
     def add_note(self, note: Note):
         self.note = note
@@ -49,7 +49,8 @@ class NoteRecord():
         self.del_note(old_note)
         self.add_note(new_note)
         self.tag = tag
-        return f"Note {old_note} was replaced by {new_note} with tag {self.tag}"
+        #return f"Note {old_note} was replaced by {new_note} with tag {self.tag}"
+        return f"\nDeleted note: {old_note}\nNew note: {new_note}\nNew Tag: {self.tag}"
 
 class NoteBook(UserDict):
     def add_record(self, record: NoteRecord):
@@ -105,7 +106,8 @@ class NoteBook(UserDict):
                 result += line
                 count += 1
         if result:
-            result = f"The following {str(count)} records were found on the fragment '{fragment}' \n\n" + result
+            #result = f"The following {str(count)} records were found on the fragment '{fragment}' \n\n" + result
+            result = f"\nSearch result {str(count)} records:\nNotes:\n{result}Search string: {fragment}"
         else:
             result = f"No records was found for the fragment '{fragment}' \n"
         return result
