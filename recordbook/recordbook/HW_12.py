@@ -193,8 +193,13 @@ def note_sort(args):
         line = f"{rec.tag} {rec.note} {rec.key}"
         result.append(line)
     result.sort()
-    for i, t in enumerate(result, 1):
-        print(i)           
+    count = 0
+    for item in result:
+        print(item)
+        count += 1
+        if count == 5:
+            input("\nFor next page press enter")
+            count = 0
     return ""
 
 
