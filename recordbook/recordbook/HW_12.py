@@ -46,7 +46,7 @@ def main():
                      "show book", "change birthday", "birthday", "search", 
                      "close", "exit", "good bye", 
                      "show all", "hello", "cls", "help", 
-                     "note add", "note change", "note del", "note find", "note show"]: result = handler(prm)
+                     "note add", "note change", "note del", "note find", "note show", "note sort"]: result = handler(prm)
         elif cmd in ["save", "load"]: result = handler(path_book)     
         
         # 4. Завершення роботи програми
@@ -184,12 +184,11 @@ def note_show(args):
 def note_sort():
     if not len(note_book.data): 
         return f"Notebook is empty"
-    result = {}
+    result = []
     for rec in note_book.values():
-        if result.get(rec.note):
-            result.
-        else:
-            result.update({rec.note: [rec]})
+        line = f"\n{rec.tag} {rec.note} {rec.key}"
+        result.append(line)
+    result.sort()
                 
     return result
 
@@ -556,7 +555,9 @@ def func_help(_):
 [bold red]note find[/bold red] - здійснює пошук за фрагментом у записнику нотаток
       example >> [bold blue]note find name[/bold blue]
 [bold red]note show[/bold red] - здійснює посторінковий вивід всіх нотаток
-      example >> [bold blue]note show 10[/bold blue]
+      example >> [bold blue]note show /10[/bold blue]
+[bold red]note sort[/bold red] - здійснює сортування записів нотаток за тегами
+      example >> [bold blue]note sort /10[/bold blue]      
 """
     
 @input_error
@@ -582,7 +583,7 @@ COMMANDS = ["good bye", "close", "exit",
             "hello", "add", "phone", "show all", "save", "load", 
             "cls", "add phone", "del phone", "change phone", "show book",
             "change birthday", "birthday", "help", "search",
-            "note add", "note del", "note change", "note find", "note show", ]
+            "note add", "note del", "note change", "note find", "note show", "note sort"]
 
 OPERATIONS = {"good bye": func_exit, "close": func_exit, "exit": func_exit,
               "hello": func_greeting, 
@@ -604,7 +605,8 @@ OPERATIONS = {"good bye": func_exit, "close": func_exit, "exit": func_exit,
               "note del": note_del,
               "note change": note_change,
               "note find": note_find,
-              "note show": note_show}
+              "note show": note_show,
+              "note sort": note_sort}
 
 if __name__ == "__main__":
     main()
