@@ -167,6 +167,19 @@ class Record():
         return True if result else False
     
 class AddressBook(UserDict):
+
+    def get_list_birthday(self, count_day: int):
+            end_date = datetime.now() + timedelta(days=int(count_day))
+            lst = [f"\nEnd date: {end_date.strftime('%d-%m-%Y')}\n"]
+            for name, person in self.items():
+                if not (person.birthday.value == "None"): 
+                    person_date = datetime.strptime(person.birthday.value, "%d.%m.%Y").date()
+                    person_month = person_date.month 
+                    person_day = person_date.day 
+                    dt = datetime(datetime.now().year, person_month, person_day) 
+                    if end_date >= dt > datetime.now(): 
+                        lst.append(f"{name}|{person.birthday.value}|{', '.join(map(lambda phone: phone.value, person.phones))}")
+            return "\n".join(lst)
        
     def add_record(self, record):
         self.data[record.name.value] = record
