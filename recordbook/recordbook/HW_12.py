@@ -4,6 +4,8 @@ import os, sys
 import platform  # для clearscrean()
 from RecordBook import AddressBook, Record, Name, Phone, Field, Birthday, PhoneException, BirthdayException, EmailException
 from clean import sort_main
+from note_book import NoteBook, NoteRecord, Note, Tag
+from datetime import datetime
 import re
 
 from rich import print
@@ -13,11 +15,15 @@ from rich.console import Console
 
 # Получаем абсолютный путь к запущенной программе
 absolute_path = os.path.abspath(sys.argv[0])
-path = Path(sys.path[0]).joinpath("data_12.bin")
+path_book = Path(sys.path[0]).joinpath("data_12.bin")
+path_note = Path(sys.path[0]).joinpath("n_book.json")
+
 book = AddressBook()
+note_book = NoteBook()
 
 # Головна функція роботи CLI(Command Line Interface - консольного скрипту) 
-def main():
+def main():    
+    note_book.load_data(path_note)
     cmd = ""
     clear_screen("")
     print("[bold white]CLI version 12.0[/bold white]")  
@@ -40,8 +46,10 @@ def main():
         if cmd in ["add", "phone", "add phone", "del phone", "change phone",
                      "show book", "change birthday", "birthday", "search", 
                      "close", "exit", "good bye", 
-                     "show all", "hello", "cls", "help", "sort"]: result = handler(prm)
-        elif cmd in ["save", "load"]: result = handler(path)     
+                     "show all", "hello", "cls", "help", 
+                     "note add", "note change", "note del", 
+                     "note find", "note show", "note sort", "sort"]: result = handler(prm)
+        elif cmd in ["save", "load"]: result = handler(path_book)     
         
         # 4. Завершення роботи програми
         if result == "Good bye!":
@@ -71,12 +79,124 @@ def input_error(func):
             print("Incorect data or unsupported format while writing to the file")
         except KeyError:
             print("Record isn't in the database")
+        except KeyboardInterrupt:
+            func_exit(_)
+        except TypeError:
+            print("Incorect data")
     return inner
 
 
 # Повертає адресу функції, що обробляє команду користувача
 def get_handler(operator):
     return OPERATIONS[operator]    
+
+
+#=========================================================
+# Блок функцій для роботи з нотатками
+#=========================================================
+# >> note add <текст нотатки будь-якої довжини> <teg-ключове слово> 
+# example >> note add My first note in this bot. #Note
+#=========================================================
+@input_error
+def note_add(args):
+    if args.rfind("#"):
+        n = args.rfind("#")  
+    key = str(datetime.now().replace(microsecond=0).timestamp())
+    note = Note(args[:n].strip())
+    tag = Tag(args[n:]) 
+    record = NoteRecord(key, note, tag)
+    return note_book.add_record(record)
+
+
+#=========================================================
+# >> note del <key-ідентифікатор запису>
+# example >> note del 1691245959.0
+#=========================================================
+@input_error
+def note_del(args):
+    key = args.strip()
+    rec : NoteRecord = note_book.get(key)
+    try:
+        return note_book.del_record(rec)
+    except KeyError:
+        return f"Record {key} does not exist."
+            
+
+#=========================================================
+# >> note change <key-record> <New notes> <tag>
+# example >> note change 1691245959.0 My new notes. #Tag 
+#=========================================================
+@input_error
+def note_change(args):
+    n = args.find(" ")
+    key = args[:n]    
+    m = args.rfind("#")
+    if m == -1: 
+        note = Note(args[n+1:])
+        tag = None
+    if len(args[n:m]) == 1: 
+        note = None
+        tag = Tag(args[m:])
+    else:
+        note = Note(args[n+1:m])
+        tag = Tag(args[m:])
+    rec : NoteRecord = note_book.get(key)
+    if rec:
+        return rec.change_note(rec.note.value, note if note else rec.note.value, tag if tag else rec.tag.value)
+    else:
+        return f"Record does not exist"
+    
+
+#=========================================================
+# >> note find <fragment>
+# Фрагмент має бути однією фразою без пробілів
+# example >> note find word
+#=========================================================
+@input_error
+def note_find(args):
+    return note_book.find_note(args)
+
+
+#=========================================================
+# >> note show <int: необов'язковий аргумент кількості рядків>
+# Передається необов'язковий аргумент кількості рядків 
+# example >> note show 15
+#=========================================================
+@input_error
+def note_show(args):
+    if args.startswith("/") and args[1:].isdigit():
+        args = int(args[1:])
+    else:
+        args = 5    
+    for page, rec in enumerate(note_book.iterator(args), 1):
+        print(f"Page {page}\n")
+        for item in rec:
+            print(f"{item}")
+        
+        input("\nFor next page press enter")
+    return ""
+
+
+#=========================================================
+# >> note sort
+# Сортування нотаток по тегу
+# example >> note sort
+#=========================================================
+@input_error
+def note_sort(args):    
+    result = []
+    for rec in note_book.values():
+        line = f"{rec.tag}  {rec.note}  {rec.key}"
+        result.append(line)
+    result.sort()
+    count = 0
+    for item in result:
+        print(item)
+        count += 1
+        if count == 5:
+            input("\nFor next page press enter\n")
+            count = 0
+    return ""
 
 
 #=========================================================
@@ -199,6 +319,7 @@ def func_change_phone(prm):
 #=========================================================
 @input_error
 def func_exit(_):
+    note_book.save_data(path_note)
     return "Good bye!"
 
 
@@ -401,8 +522,7 @@ def load_phoneDB(path):
 #========================================================= 
 @input_error
 def save_phoneDB(path):
-    return book.save_database(path)
-    #return book.save_database(book, path)
+    return book.save_database(path_book)
     
     
 #=========================================================
@@ -454,6 +574,18 @@ def func_help(_):
       example >> [bold blue]change birthday Mike 02.03.1990[/bold blue]
 [bold red]search[/bold red] - виконує пошук інформації по довідковій книзі
       example >> [bold blue]search Mike[/bold blue]
+[bold red]note add[/bold red] - додає нотатку з тегом у записник нотаток
+      example >> [bold blue]note add My first note Note[/bold blue]
+[bold red]note del[/bold red] - видаляє нотатку за ключем із записника нотаток
+      example >> [bold blue]note del 1691245959.0[/bold blue]
+[bold red]note change[/bold red] - змінює нотатку з тегом за ключем у записнику нотаток
+      example >> [bold blue]note change 1691245959.0 My first note Note[/bold blue]
+[bold red]note find[/bold red] - здійснює пошук за фрагментом у записнику нотаток
+      example >> [bold blue]note find name[/bold blue]
+[bold red]note show[/bold red] - здійснює посторінковий вивід всіх нотаток
+      example >> [bold blue]note show /10[/bold blue]
+[bold red]note sort[/bold red] - здійснює сортування записів нотаток за тегами
+      example >> [bold blue]note sort /10[/bold blue]      
 [bold red]sort[/bold red] - виконує сортування файлів в указаній папці
       example >> [bold blue]sort folder_name[/bold blue]
 """
@@ -480,7 +612,8 @@ def get_count_prm(prm: list):
 COMMANDS = ["good bye", "close", "exit",
             "hello", "add", "phone", "show all", "save", "load", 
             "cls", "add phone", "del phone", "change phone", "show book",
-            "change birthday", "birthday", "help", "search", "sort"]
+            "change birthday", "birthday", "help", "search",
+            "note add", "note del", "note change", "note find", "note show", "note sort", "sort"]
 
 OPERATIONS = {"good bye": func_exit, "close": func_exit, "exit": func_exit,
               "hello": func_greeting, 
@@ -497,7 +630,13 @@ OPERATIONS = {"good bye": func_exit, "close": func_exit, "exit": func_exit,
               "change birthday": func_change_birthday,
               "birthday": func_get_day_birthday,
               "help": func_help,
-              "search": func_search, 
+              "search": func_search,
+              "note add": note_add,
+              "note del": note_del,
+              "note change": note_change,
+              "note find": note_find,
+              "note show": note_show,
+              "note sort": note_sort, 
               "sort": func_sort}
 
 if __name__ == "__main__":
