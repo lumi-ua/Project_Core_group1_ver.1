@@ -167,9 +167,7 @@ def note_show(args):
     if args.startswith("/") and args[1:].isdigit():
         args = int(args[1:])
     else:
-        args = 5
-    if not len(note_book.data): 
-        return f"Notebook is empty"
+        args = 5    
     for page, rec in enumerate(note_book.iterator(args), 1):
         print(f"Page {page}\n")
         for item in rec:
@@ -185,9 +183,7 @@ def note_show(args):
 # example >> note sort
 #=========================================================
 @input_error
-def note_sort(args):
-    if not len(note_book.data): 
-        return f"Notebook is empty"
+def note_sort(args):    
     result = []
     for rec in note_book.values():
         line = f"{rec.tag}  {rec.note}  {rec.key}"

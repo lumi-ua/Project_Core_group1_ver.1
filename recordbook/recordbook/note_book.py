@@ -93,9 +93,11 @@ class NoteBook(UserDict):
                     self.data[record.key] = record
 
             if isinstance(self.data, dict):
-                print(f"The note_book is loaded.")
+                print(f"The Notebook is loaded.")
+                if not len(self.data): 
+                    return f"Notebook is empty"
             else:
-                print("The file does not contain a valid note_book.")
+                print("The file does not contain a valid Notebook.")
         except FileNotFoundError:
             print(f"The file {filename} does not exist")
 
@@ -108,8 +110,7 @@ class NoteBook(UserDict):
             if fragment in line.lower():
                 result += line
                 count += 1
-        if result:
-            #result = f"The following {str(count)} records were found on the fragment '{fragment}' \n\n" + result
+        if result:            
             result = f"\nSearch result {str(count)} records:\nNotes:\n{result}Search string: {fragment}"
         else:
             result = f"No records was found for the fragment '{fragment}' \n"
