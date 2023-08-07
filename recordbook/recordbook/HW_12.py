@@ -408,6 +408,7 @@ def func_change_birthday(prm):
 # >> birthday    Done
 # функція повертає кількість днів до Дня Народження особи    
 # Example >> birthday Mike
+# Example >> birthday /365
 #=========================================================
 @input_error
 def func_get_day_birthday(prm):
@@ -417,11 +418,17 @@ def func_get_day_birthday(prm):
     if prm[0] == "": return f'Missed [bold red]Name[/bold red] of the person'
         
     if prm and (count_prm >= 1):
-        name = prm[0].lower().capitalize()
-        if name in book.keys():
-            if book[name].birthday.value == "None": return f"No [bold red]Birthday[/bold red] for {name}"
-            return book[name].days_to_birthday() 
-        else: return f"The [bold red]{name}[/bold red] isn't in a database"
+        if "/" in prm[0]:   # Example >> birthday /365
+            count_day = int(re.sub("\/", "",prm[0]))
+            if not count_day > 0: return f"Enter the number of days greater than zero"
+            return book.get_list_birthday(count_day)
+            
+        else: # Example >> birthday Mike
+            name = prm[0].lower().capitalize()
+            if name in book.keys():
+                if book[name].birthday.value == "None": return f"No [bold red]Birthday[/bold red] for {name}"
+                return book[name].days_to_birthday() 
+            else: return f"The [bold red]{name}[/bold red] isn't in a database"
     else: return f"Expected 1 arguments, but {count_prm} was given.\nHer's an example >> birthday Mike"
 
 

@@ -2,8 +2,9 @@
 from collections import UserDict
 from collections.abc import Iterator
 import re
-import datetime
 import pickle
+from datetime import datetime
+from datetime import timedelta
 
 # батьківський клас
 class Field():
@@ -136,23 +137,23 @@ class Record():
     # повертає кількість днів до наступного дня народження
     def days_to_birthday(self):
         if self.birthday.value:
-            now_date = datetime.datetime.now()
+            now_date = datetime.now()
             now_year = now_date.year
             
              # Определяем формат строки для Даты
             date_format = "%d.%m.%Y %H:%M:%S"
             # Строка с Датой народження
             date_string = f"{self.birthday.value} 00:00:00"  
-            dt = datetime.datetime.strptime(date_string, date_format)
+            dt = datetime.strptime(date_string, date_format)
             
-            birthday = datetime.datetime(day=dt.day, month=dt.month, year=now_year)
+            birthday = datetime(day=dt.day, month=dt.month, year=now_year)
             
             if now_date > birthday:
                 birthday = birthday.replace(year=now_date.year + 1)
-                dif = birthday - now_date
+                dif = (birthday - now_date).days
                 return f"до {birthday.strftime('%d.%m.%Y')} залишилося = {dif}"
             else:
-                dif = birthday - now_date
+                dif = (birthday - now_date).days
                 return f"до {birthday.strftime('%d.%m.%Y')} залишилося = {dif}"
         else: return f"We have no information about {self.name.value}'s birthday."
     
@@ -167,6 +168,19 @@ class Record():
         return True if result else False
     
 class AddressBook(UserDict):
+
+    def get_list_birthday(self, count_day: int):
+            end_date = datetime.now() + timedelta(days=int(count_day))
+            lst = [f"\nEnd date: {end_date.strftime('%d.%m.%Y')}"]
+            for name, person in self.items():
+                if not (person.birthday.value == "None"): 
+                    person_date = datetime.strptime(person.birthday.value, "%d.%m.%Y").date()
+                    person_month = person_date.month 
+                    person_day = person_date.day 
+                    dt = datetime(datetime.now().year, person_month, person_day) 
+                    if end_date >= dt > datetime.now(): 
+                        lst.append(f"{name}|{person.birthday.value}|{', '.join(map(lambda phone: phone.value, person.phones))}")
+            return "\n".join(lst)
        
     def add_record(self, record):
         self.data[record.name.value] = record
