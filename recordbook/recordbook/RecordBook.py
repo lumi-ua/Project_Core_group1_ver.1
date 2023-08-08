@@ -187,10 +187,12 @@ class AddressBook(UserDict):
     
     # завантаження записів книги із файлу
     def load_database(self, path):
-        with open(path, "rb") as fr_bin:
-            self.data = pickle.load(fr_bin)  # копирование Словника   load_data = pickle.load(fr_bin)
+        if path.exists():
+            with open(path, "rb") as fr_bin:
+                self.data = pickle.load(fr_bin)  # копирование Словника   load_data = pickle.load(fr_bin)
                                                                     # self.data = {**load_data}
-        return f"The database has been loaded = {len(self.data)} records"
+            return f"The database has been loaded = {len(self.data)} records"
+        return ""
     
     #-----------------------------------------
     # збереження записів книги у файл  

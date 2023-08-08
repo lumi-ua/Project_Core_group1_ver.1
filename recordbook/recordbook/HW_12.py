@@ -14,8 +14,6 @@ from rich import box
 from rich.table import Table
 from rich.console import Console
 
-# Получаем абсолютный путь к запущенной программе
-absolute_path = os.path.abspath(sys.argv[0])
 path_book = Path(sys.path[0]).joinpath("user_book.bin")
 path_note = Path(sys.path[0]).joinpath("note_book.json")
 
@@ -277,7 +275,7 @@ def func_change_phone(*args):
 @input_error
 def func_exit(*args):
     print("Good bye!")
-    #address_book.save_to_file(filename)
+    book.save_database(path_book)
     exit(0)
     return "Good bye!"
 
@@ -422,22 +420,6 @@ def func_sort(*args):
     else:
         return f"[bold yellow]Enter path[/bold yellow]"
 
-#=========================================================
-# Функція читає базу даних з файлу - ОК
-#========================================================= 
-@input_error
-def load_phoneDB(path):
-    return book.load_database(path)
-    #return book.load_database(book, path)
-
-
-#=========================================================
-# Функція виконує збереження бази даних - OK
-#========================================================= 
-@input_error
-def save_phoneDB(path):
-    return book.save_database(path_book)
-
 
 @input_error
 def func_help(*args):
@@ -500,8 +482,6 @@ COMMANDS = {
     func_new_rec: ("user+", "add+", "add-user", "new", ),
     func_phone: ("phone",),
     func_all_phone: ("show-all", "show_all", "showall"),
-    save_phoneDB: ("save",),
-    load_phoneDB: ("load",),
     func_add_phone: ("add-phone", "add_phone",),
     func_del_phone: ("del-phone", "del_phone"),
     func_change_phone: ("edit-phone", "change-phone", "change_phone"),
@@ -562,6 +542,8 @@ def parser(text: str):
 
 def main():
     print("[white]Run >> [/white][bold red]help[/bold red] - list of the commands")
+    global path_book
+    book.load_database(path_book)
 
     while True:
         user_input = input(">>>")
