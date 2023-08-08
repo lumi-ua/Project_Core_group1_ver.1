@@ -67,11 +67,11 @@ class NoteRecord():
 
 class NoteBook(UserDict):
 
-    def __init__(self):
-        # список всех ноутов, быстрый поиск по ключу, ключ=гарантия уникальности
-        self.notes_dict = dict() # dict(note.key, Note)
-        # список всех тэгов, быстрый поиск по ключу, где ключ - текст самого тэга, ключ - гарантия уникальности
-        self.tags_dict = dict() # dict(tag=str, Tag)
+    #def __init__(self):
+    #    # список всех ноутов, быстрый поиск по ключу, ключ=гарантия уникальности
+    #    self.notes_dict = dict() # dict(note.key, Note)
+    #    # список всех тэгов, быстрый поиск по ключу, где ключ - текст самого тэга, ключ - гарантия уникальности
+    #    self.tags_dict = dict() # dict(tag=str, Tag)
 
     def attach_tags_list(note_key: str, tags_list: list):
         # пробегаем по всем ключам входного списка тэгов
