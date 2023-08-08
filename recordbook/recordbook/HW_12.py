@@ -200,7 +200,7 @@ def func_new_rec(*args):
 # с номерами телефонов в консоль. 
 #=========================================================
 @input_error
-def func_all_phone(*args)->str:
+def func_show_all(*args)->str:
     if len(book.data) == 0: 
         return "The database is empty"
     else: 
@@ -212,8 +212,8 @@ def func_all_phone(*args)->str:
         table.add_column("Address", justify="center", style="red", no_wrap=True)
         
         console = Console()
-        result = [table.add_row(str(record.name.value), str(record.birthday.value), str(', '.join(map(lambda phone: phone.value, record.phones))), 
-            str(record.email.value), str(record.address.value)) for record in book.data.values()]        
+        result = [table.add_row(str(record.name.value), str(record.birthday), str(', '.join(map(lambda phone: phone.value, record.phones))), 
+            str(record.email), str(record.address)) for record in book.data.values()]        
         console.print(table)
         return ""
         
@@ -531,7 +531,7 @@ COMMANDS = {
     func_hello: ("hello", "hy", "welcome",),
     func_new_rec: ("user+", "add+", "add-user", "new", ),
     func_phone: ("phone",),
-    func_all_phone: ("show-all", "show_all", "showall"),
+    func_show_all: ("show-all", "show_all", "showall"),
     func_add_phone: ("add-phone", "add_phone",),
     func_del_phone: ("del-phone", "del_phone"),
     func_del_birthday: ("del-birthday", "del_birthday"),

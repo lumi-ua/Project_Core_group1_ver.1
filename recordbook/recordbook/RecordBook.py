@@ -21,7 +21,9 @@ class Field():
         self.__value = value
 
     def __str__(self) -> str:
-        return self.value
+        if self.__value:
+            return self.value
+        return ""
 
     def __repr__(self) -> str:
         return str(self.value)
