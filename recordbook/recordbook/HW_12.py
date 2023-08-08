@@ -2,7 +2,7 @@
 from pathlib import Path
 import os, sys
 import platform  # для clearscrean()
-from RecordBook import AddressBook, Record, Name, Phone, Field, Birthday, PhoneException, BirthdayException, EmailException
+from RecordBook import AddressBook, Record, Name, Phone, Email, Birthday, Address, PhoneException, BirthdayException, EmailException
 from clean import sort_main
 from note_book import NoteBook, NoteRecord, Note, Tag
 from datetime import datetime
@@ -205,12 +205,15 @@ def func_all_phone(*args)->str:
         return "The database is empty"
     else: 
         table = Table(box=box.DOUBLE)
-        table.add_column("Name", justify="left", style="cyan", no_wrap=True)
+        table.add_column("Name", justify="center", style="cyan", no_wrap=True)
         table.add_column("Birthday", justify="center", style="yellow", no_wrap=True)
-        table.add_column("Phone number", justify="left", style="green", no_wrap=True)
+        table.add_column("Phone number", justify="center", style="green", no_wrap=True)
+        table.add_column("Email", justify="center", style="red", no_wrap=True)
+        table.add_column("Address", justify="center", style="red", no_wrap=True)
         
         console = Console()
-        result = [table.add_row(record.name.value, record.birthday.value, ', '.join(map(lambda phone: phone.value, record.phones))) for record in book.data.values()]
+        result = [table.add_row(str(record.name.value), str(record.birthday.value), str(', '.join(map(lambda phone: phone.value, record.phones))), 
+            str(record.email.value), str(record.address.value)) for record in book.data.values()]        
         console.print(table)
         return ""
         
@@ -343,10 +346,28 @@ def func_change_birthday(*args):
     if (len(args) == 2):
         name = args[0].capitalize()
         if name in book.keys():
-            return book[name].change_birthday(Birthday(args[1]))
+            return book[name].edit_birthday(Birthday(args[1]))
         else: return f"The [bold red]{name}[/bold red] isn't in a database"
     else: return f"Expected 2 arguments\nHer's an example >> change birthday Mike 12.05.1990"
 
+@input_error
+def func_change_email(*args):
+    if (len(args) == 2):
+        name = args[0].capitalize()
+        if name in book.keys():
+            print(args[1])
+            return book[name].edit_email(Email(args[1]))
+        else: return f"The [bold red]{name}[/bold red] isn't in a database"
+    else: return f"Expected 2 arguments\nHer's an example >> change birthday Mike 12.05.1990"
+
+@input_error
+def func_change_address(*args):
+    if (len(args) == 2):
+        name = args[0].capitalize()
+        if name in book.keys():
+            return book[name].edit_address(Address(args[1]))
+        else: return f"The [bold red]{name}[/bold red] isn't in a database"
+    else: return f"Expected 2 arguments\nHer's an example >> change birthday Mike 12.05.1990"
 
 #=========================================================
 # >> birthday    Done
@@ -369,7 +390,7 @@ def func_get_birthday(*args):
 # Не надо добавлять запятую в конце каждого номера 
 @input_error 
 def func_del_phone(*args):
-    if (len(args) >= 2):
+    if (len(args) == 2):
         name = args[0].capitalize()
         if name in book.keys():
             # формуємо список  об'єктів Phone, тому що на майбутнє хочу реалізувати видалення декількох телефонів 
@@ -379,6 +400,35 @@ def func_del_phone(*args):
             return f"The name {name} isn't in database - [bold red]fail[/bold red]"
     else: return f"Expected 2 arguments\nHer's an example >> del phone Mike +380509998877"
 
+@input_error 
+def func_del_birthday(*args):
+    if (len(args) == 1):
+        name = args[0].capitalize()
+        if name in book.keys():
+            return book[name].edit_birthday(Birthday(None))
+        else:
+            return f"The name {name} isn't in database - [bold red]fail[/bold red]"
+    else: return f"Expected 1 arguments"
+
+@input_error 
+def func_del_email(*args):
+    if (len(args) == 1):
+        name = args[0].capitalize()
+        if name in book.keys():
+            return book[name].edit_email(Email(None))
+        else:
+            return f"The name {name} isn't in database - [bold red]fail[/bold red]"
+    else: return f"Expected 1 arguments"
+
+@input_error 
+def func_del_address(*args):
+    if (len(args) == 1):
+        name = args[0].capitalize()
+        if name in book.keys():
+            return book[name].edit_address(Address(None))
+        else:
+            return f"The name {name} isn't in database - [bold red]fail[/bold red]"
+    else: return f"Expected 1 arguments"
 
 #=========================================================
 # >> search    Done
@@ -484,9 +534,14 @@ COMMANDS = {
     func_all_phone: ("show-all", "show_all", "showall"),
     func_add_phone: ("add-phone", "add_phone",),
     func_del_phone: ("del-phone", "del_phone"),
+    func_del_birthday: ("del-birthday", "del_birthday"),
+    func_del_email: ("del-email", "del_email"),
+    func_del_address: ("del-address", "del_address"),
     func_change_phone: ("edit-phone", "change-phone", "change_phone"),
     func_book_pages: ("show-book", "show_book", "showbook"),
-    func_change_birthday: ("change-birthday", "change_birthday"),
+    func_change_birthday: ("edit-birthday", "edit_birthday"),
+    func_change_email: ("edit-email", "edit_email"),
+    func_change_address: ("edit-address", "edit_address"),
     func_get_birthday: ("birthday",),
     func_help: ("help", "?",),
     func_search: ("search", "find", "seek"),

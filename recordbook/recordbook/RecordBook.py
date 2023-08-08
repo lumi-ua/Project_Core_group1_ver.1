@@ -12,6 +12,19 @@ class Field():
         self.__value = None
         self.value = value
     
+    @property
+    def value(self):
+        return self.__value
+
+    @value.setter
+    def value(self, value):
+        self.__value = value
+
+    def __str__(self) -> str:
+        return self.value
+
+    def __repr__(self) -> str:
+        return str(self.value)
     
 # клас Ім'я
 class Name(Field):
@@ -20,8 +33,8 @@ class Name(Field):
         return self.__value
     
     @value.setter
-    def value(self, new_value):
-        self.__value = new_value
+    def value(self, value):
+        self.__value = value
 
   
 
@@ -32,14 +45,14 @@ class Phone(Field):
         return self.__value 
     
     @value.setter
-    def value(self, new_value):
-        if new_value.lower() == "none": 
+    def value(self, value):
+        if value.lower() == "none": 
             self.__value = "None"
             return ""   # не видаляти
         
-        if new_value:
+        if value:
             correct_phone = ""
-            for i in new_value: 
+            for i in value: 
                 if i in "+0123456789": correct_phone += i
 
             if len(correct_phone) == 13: self.__value = correct_phone # "+380123456789"
@@ -56,12 +69,16 @@ class Birthday(Field):
         return self.__value
     
     @value.setter
-    def value(self, new_birthday:str):
-        pattern = r"^\d{2}(\.|\-|\/)\d{2}\1\d{4}$"  # дозволені дати формату DD.MM.YYYY 
-        if re.match(pattern, new_birthday):         # альтернатива для крапки: "-" "/"
-            self.__value = re.sub("[-/]", ".", new_birthday)  # комбінувати символи ЗАБОРОНЕНО DD.MM-YYYY 
-        else: 
+    def value(self, value: str):
+        if value == None: 
             self.__value = None
+            # raise BirthdayException("Unauthorized birthday format")
+        else:
+            pattern = r"^\d{2}(\.|\-|\/)\d{2}\1\d{4}$"  # дозволені дати формату DD.MM.YYYY 
+            if re.match(pattern, value):         # альтернатива для крапки: "-" "/"
+                self.__value = re.sub("[-/]", ".", value)  # комбінувати символи ЗАБОРОНЕНО DD.MM-YYYY 
+            else: 
+                self.__value = None
 
 
 class Address(Field):
@@ -70,9 +87,8 @@ class Address(Field):
         return self.__value
     
     @value.setter
-    def value(self, new_value):
-        self.__value = new_value
-
+    def value(self, value: str):
+        self.__value = value
   
 
 class Email(Field):
@@ -82,33 +98,55 @@ class Email(Field):
     
     @value.setter
     def value(self, value: str):
-        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-        if not re.match(pattern, value):
-            raise EmailException("Invalid email address!")
+        if value == None: 
+            self.__value = None
         else:
-            self.__value = value 
-
-            
+            pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+            if not re.match(pattern, value):
+                raise EmailException("Invalid email address!")
+            else:
+                self.__value = value
       
-        
+
 #========================================================
 # Класс Record, который отвечает за логику 
 #  - добавления/удаления/редактирования
 # необязательных полей и хранения обязательного поля Name
 #=========================================================
 class Record():
-    def __init__(self, name: Name, birthday: Birthday=None, phones=None) -> None:
-        self.name = name            
+    def __init__(self, name:Name, phones: list, email: Email=None, birthday: Birthday=None, address: Address=None) -> None:
+        self.name = name
+        self.email = email
         self.birthday = birthday
+        self.address = address
         self.phones = []            
         self.phones.extend(phones)
-    
+
+
+    def edit_birthday(self, birthday: Birthday):
+        self.birthday = birthday
+
+    def edit_email(self, email: Email): 
+        self.email = email
+
+    def edit_address(self, address: Address): 
+        self.address = address
+
+    def change_name(self, name:Name, new_name:Name) -> None: 
+        if self.name.value == name.value: self.name = new_name
+
     def __str__(self) -> str:
+        result = f"{', '.join(map(lambda phone: phone.value, self.phones))}"
         if self.birthday.value != None:
-            return f"{self.name.value}|{self.birthday.value}|{', '.join(map(lambda phone: phone.value, self.phones))}"
-        else:
-            return f"{self.name.value}|{', '.join(map(lambda phone: phone.value, self.phones))}"        
-    
+            result = f"{self.birthday.value}|" + result
+        if self.email != None and self.email.value != None:
+            result = f"{self.email.value}|" + result
+        if self.address != None and self.address.value != None:
+            result = f"{self.address.value}|" + result
+
+        return f"{self.name.value}|" + result
+      
+
     # Done - розширюємо існуючий список телефонів особи - Done
     # НОВИМ телефоном або декількома телефонами для особи - Done
     def add_phone(self, list_phones) -> str:
@@ -156,11 +194,6 @@ class Record():
                 return f"до {birthday.strftime('%d.%m.%Y')} залишилося = {dif}"
         else: return f"We have no information about {self.name.value}'s birthday."
     
-    # змінює день народження для особи
-    def change_birthday(self, birthday: Birthday):
-        self.birthday = birthday
-        return f"Birthday for {self.name.value} is changed - [bold green]success[/bold green]"
-    
     # перевіряє наявність 1(одного)телефону у списку
     def check_dublicate_phone(self, search_phone: str) ->bool:  
         result = list(map(lambda phone: any(phone.value == search_phone), self.data[self.name.value].phones))
@@ -184,6 +217,7 @@ class AddressBook(UserDict):
        
     def add_record(self, record):
         self.data[record.name.value] = record
+        return "1 record was successfully added - [bold green]success[/bold green]"
     
     # завантаження записів книги із файлу
     def load_database(self, path):
@@ -197,9 +231,6 @@ class AddressBook(UserDict):
     #-----------------------------------------
     # збереження записів книги у файл  
     # формат збереження даних:
-    #
-    # Lisa|15.08.1984|+380739990022, +380677711122
-    # Alex|None|+380954448899, +380506667788   
     #-------------------------------------------
     def save_database(self, path):
         with open(path, "wb") as f_out:
