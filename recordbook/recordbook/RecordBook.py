@@ -46,11 +46,7 @@ class Phone(Field):
             elif len(correct_phone) == 12: self.__value = "+" + correct_phone # "380123456789"
             elif len(correct_phone) == 10: self.__value = "+38" + correct_phone # "0123456789"
             elif len(correct_phone) == 9: self.__value = "+380" + correct_phone # "123456789"
-            else: raise PhoneException("Incorrect phone format")   # невірний формат телефона
-
-    
-
-            
+            else: raise PhoneException("Incorrect phone format")   # невірний формат телефона            
 
     
 # клас День народження        
@@ -65,8 +61,8 @@ class Birthday(Field):
         if re.match(pattern, new_birthday):         # альтернатива для крапки: "-" "/"
             self.__value = re.sub("[-/]", ".", new_birthday)  # комбінувати символи ЗАБОРОНЕНО DD.MM-YYYY 
         else: 
-            self.__value = "None"
-            # raise BirthdayException("Unauthorized birthday format")
+            self.__value = None
+
 
 class Address(Field):
     @property
@@ -101,19 +97,22 @@ class Email(Field):
 # необязательных полей и хранения обязательного поля Name
 #=========================================================
 class Record():
-    def __init__(self, name: Name, birthday: Birthday=None, phones: list[Phone]=None) -> None:
+    def __init__(self, name: Name, birthday: Birthday=None, phones=None) -> None:
         self.name = name            
         self.birthday = birthday
         self.phones = []            
         self.phones.extend(phones)
     
     def __str__(self) -> str:
-        return f"{self.name.value}|{self.birthday.value}|{', '.join(map(lambda phone: phone.value, self.phones))}" 
+        if self.birthday.value != None:
+            return f"{self.name.value}|{self.birthday.value}|{', '.join(map(lambda phone: phone.value, self.phones))}"
+        else:
+            return f"{self.name.value}|{', '.join(map(lambda phone: phone.value, self.phones))}"        
     
     # Done - розширюємо існуючий список телефонів особи - Done
     # НОВИМ телефоном або декількома телефонами для особи - Done
-    def add_phone(self, new_phone: list[Phone]) -> str:
-        self.phones.extend(new_phone)
+    def add_phone(self, list_phones) -> str:
+        self.phones.extend(list_phones)
         return f"The phones was/were added - [bold green]success[/bold green]"
     
     # Done - видаляємо телефони із списку телефонів особи - Done!
@@ -170,17 +169,18 @@ class Record():
 class AddressBook(UserDict):
 
     def get_list_birthday(self, count_day: int):
-            end_date = datetime.now() + timedelta(days=int(count_day))
-            lst = [f"\nEnd date: {end_date.strftime('%d.%m.%Y')}"]
-            for name, person in self.items():
-                if not (person.birthday.value == "None"): 
-                    person_date = datetime.strptime(person.birthday.value, "%d.%m.%Y").date()
-                    person_month = person_date.month 
-                    person_day = person_date.day 
-                    dt = datetime(datetime.now().year, person_month, person_day) 
-                    if end_date >= dt > datetime.now(): 
-                        lst.append(f"{name}|{person.birthday.value}|{', '.join(map(lambda phone: phone.value, person.phones))}")
-            return "\n".join(lst)
+        if count_day < 0: return []
+        end_date = datetime.now() + timedelta(days=int(count_day))
+        lst = [f"\nEnd date: {end_date.strftime('%d.%m.%Y')}"]
+        for name, person in self.items():
+            if not (person.birthday.value == "None"): 
+                person_date = datetime.strptime(person.birthday.value, "%d.%m.%Y").date()
+                person_month = person_date.month 
+                person_day = person_date.day 
+                dt = datetime(datetime.now().year, person_month, person_day) 
+                if end_date >= dt > datetime.now(): 
+                    lst.append(f"{name}|{person.birthday.value}|{', '.join(map(lambda phone: phone.value, person.phones))}")
+        return "\n".join(lst)
        
     def add_record(self, record):
         self.data[record.name.value] = record

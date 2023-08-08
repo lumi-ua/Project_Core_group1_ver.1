@@ -7,6 +7,7 @@ from clean import sort_main
 from note_book import NoteBook, NoteRecord, Note, Tag
 from datetime import datetime
 import re
+import readline # pip install pyreadline3
 
 from rich import print
 from rich import box
@@ -15,57 +16,18 @@ from rich.console import Console
 
 # Получаем абсолютный путь к запущенной программе
 absolute_path = os.path.abspath(sys.argv[0])
-path_book = Path(sys.path[0]).joinpath("data_12.bin")
-path_note = Path(sys.path[0]).joinpath("n_book.json")
+path_book = Path(sys.path[0]).joinpath("user_book.bin")
+path_note = Path(sys.path[0]).joinpath("note_book.json")
 
 book = AddressBook()
 note_book = NoteBook()
-
-# Головна функція роботи CLI(Command Line Interface - консольного скрипту) 
-def main():    
-    note_book.load_data(path_note)
-    cmd = ""
-    clear_screen("")
-    print("[bold white]CLI version 12.0[/bold white]")  
-    print("[white]Run >> [/white][bold red]help[/bold red] - list of the commands")
-    
-    # головний цикл обробки команд користувача
-    while True:
-        # 1. Отримаємо команду від користувача
-        cmd = input(">> ")    
         
-        # 2. Виконуємо розбір командної строки
-        cmd, prm = parcer_commands(cmd)
-        
-        # 3. Отримуємо handler_functions тобто ДІЮ
-        if cmd: handler = get_handler(cmd)
-        else: 
-            print("Command was not recognized")
-            continue
-        
-        if cmd in ["add", "phone", "add phone", "del phone", "change phone",
-                     "show book", "change birthday", "birthday", "search", 
-                     "close", "exit", "good bye", 
-                     "show all", "hello", "cls", "help", 
-                     "note add", "note change", "note del", 
-                     "note find", "note show", "note sort", "sort"]: result = handler(prm)
-        elif cmd in ["save", "load"]: result = handler(path_book)     
-        
-        # 4. Завершення роботи програми
-        if result == "Good bye!":
-            print("Good bye!")
-            break
-#------------------------------------------------------------------
-            
 # Декоратор для Обробки командної строки
 def input_error(func):
-    def inner(prm):
+    def wrapper(*args):
+        result = None
         try:
-            result = func(prm) # handler()
-            if not result == "Good bye!": 
-                print(result)      # ПЕЧАТЬ всіх Message від всіх функцій обробників
-            else: return result   
-        
+            result = func(*args)
         # Обробка виключних ситуацій
         except BirthdayException as e:
             print(e)
@@ -80,31 +42,27 @@ def input_error(func):
         except KeyError:
             print("Record isn't in the database")
         except KeyboardInterrupt:
-            func_exit(_)
+            func_exit(args)
         except TypeError:
             print("Incorect data")
-    return inner
-
-
-# Повертає адресу функції, що обробляє команду користувача
-def get_handler(operator):
-    return OPERATIONS[operator]    
+        return result
+    return wrapper
 
 
 #=========================================================
 # Блок функцій для роботи з нотатками
 #=========================================================
-# >> note add <текст нотатки будь-якої довжини> <teg-ключове слово> 
-# example >> note add My first note in this bot. #Note
+# >> note-add <текст нотатки будь-якої довжини> <teg-ключове слово> 
+# example >> note-add My first note in this bot.
 #=========================================================
 @input_error
 def note_add(args):
     if args.rfind("#"):
         n = args.rfind("#")  
     key = str(datetime.now().replace(microsecond=0).timestamp())
-    note = Note(args[:n].strip())
-    tag = Tag(args[n:]) 
-    record = NoteRecord(key, note, tag)
+    note = Note(args.strip())
+    #tag = Tag(args[n:]) 
+    record = NoteRecord(key, note, tag=None)
     return note_book.add_record(record)
 
 
@@ -206,24 +164,31 @@ def note_sort(args):
 # example >> add Mike 02.10.1990 +380504995876
 #=========================================================
 @input_error
-def func_add_rec(prm):
-    # порахуємо кількість параметрів
-    count_prm = get_count_prm(prm)
-        
-    if prm and (count_prm >= 3):
+def func_new_rec(*args):
+
+    count_prm = len(args)
+
+    if (count_prm >= 2):
         # Якщо ключ (ІМ'Я) що користувач хоче ДОДАТИ не ІСНУЄ тобто можемо додавати
-        if not prm.partition(" ")[0].capitalize() in book.keys():
-            name = prm.partition(" ")[0]
-            new_name = Name(prm.partition(" ")[0].capitalize())
-            prm = prm.removeprefix(f"{name} ")
-            
-            new_birthday = Birthday(prm.partition(" ")[0])
-            
-            # формуємо список телефонів
-            lst_phones = list(map(lambda phone: Phone(phone.strip()), prm.partition(" ")[2].split(",")))
-            
-            rec = Record(name=new_name, birthday=new_birthday, phones=lst_phones)
-            book.add_record(rec)
+        if not args[0].capitalize() in book.keys():
+
+            name = args[0]
+            new_name = Name(args[0].capitalize())
+           
+            # TODO: refactor birthday-positioing
+            new_birthday = Birthday(args[1])
+
+            if new_birthday.value == None:
+                args = args[1:]
+            else:
+                args = args[2:]
+     
+            if len(args) > 0:
+                lst_phones = list(map(lambda phone: Phone(phone.strip()), args))
+                rec = Record(name=new_name, birthday=new_birthday, phones=lst_phones)
+                book.add_record(rec)
+            else:
+                raise PhoneException("Phone absent in arguments")
             
             return "1 record was successfully added - [bold green]success[/bold green]"
         else: return "The person is already in database"  # Повернемо помилку -> "Неможливо дадати існуючу людину"
@@ -237,7 +202,7 @@ def func_add_rec(prm):
 # с номерами телефонов в консоль. 
 #=========================================================
 @input_error
-def func_all_phone(_)->str:
+def func_all_phone(*args)->str:
     if len(book.data) == 0: 
         return "The database is empty"
     else: 
@@ -264,9 +229,9 @@ def func_all_phone(_)->str:
 # де N - це кількість записів на одній сторінці
 #=========================================================
 @input_error
-def func_book_pages(prm):
+def func_book_pages(*args):
     # Итерируемся по адресной книге и выводим представление для каждой записи
-    n = int(re.sub("\D", "", prm))
+    n = int(re.sub("\D", "", args[0]))
     n_page = 0
     for batch in book._record_generator(N=n):
         n_page += 1
@@ -288,24 +253,16 @@ def func_book_pages(prm):
 # >> change phone Mike +38099 +38050777
 #=========================================================
 @input_error 
-def func_change_phone(prm):
+def func_change_phone(*args):
     # порахуємо кількість параметрів
-    count_prm = get_count_prm(prm)
-    if prm and (count_prm >= 3):
-        name = prm.partition(" ")[0].lower().capitalize()
-            
+    count_prm = len(args)
+
+    if (count_prm >= 3):
+        name = args[0].capitalize()
+
         if name in book.keys():
-            lst = prm.split()
-            if not lst[1].isdigit():   # old_phone = None
-                old_phone = lst[1].lower().capitalize() # change phone stive 380502220011 380990005511
-            else: old_phone = f"+{lst[1]}" if not lst[1].startswith("+") else lst[1]   
-            
-            # перевіремо наявність телефону що будемо замінювати у базі даних
-            number_exists = any(phone.value == old_phone for phone in book[name].phones)
-            if number_exists:
-                return book[name].edit_phone(Phone(lst[1]), Phone(lst[2]))
-            else:
-                return f"The phone {lst[1]} for {name} isn't in the database - [bold red]fail[/bold red]"
+            if args[1].isdigit() and args[2].isdigit():   # old_phone = None
+                return book[name].edit_phone(Phone(args[1]), Phone(args[2]))
         else:
             return f"The record {name} wasn't found in the database - [bold red]fail[/bold red]"
     else: 
@@ -318,8 +275,10 @@ def func_change_phone(prm):
 # после того, как выведет в консоль "Good bye!".
 #=========================================================
 @input_error
-def func_exit(_):
-    note_book.save_data(path_note)
+def func_exit(*args):
+    print("Good bye!")
+    #address_book.save_to_file(filename)
+    exit(0)
     return "Good bye!"
 
 
@@ -328,9 +287,14 @@ def func_exit(_):
 # Отвечает в консоль "How can I help you?"
 #=========================================================
 @input_error
-def func_greeting(_):
+def func_hello(*args):
     return "How can I help you?"
 
+
+@input_error
+def no_command(*args):
+    print("Unknown command")
+    return func_hello(args=args)
 
 #=========================================================
 # >> phone ... Done
@@ -339,49 +303,36 @@ def func_greeting(_):
 # >> phone Ben
 #=========================================================
 @input_error
-def func_phone(prm):
-    prm = prm.split(" ")
-    if prm[0] == "": return f'Missed "Name" of the person'
-    name = prm[0].lower().capitalize()
-    if name in book.keys():   
-        if prm: return ", ".join([phone.value for phone in book[name].phones])
-        else: return f"Expected 1 argument, but 0 was given.\nHer's an example >> phone Name"
+def func_phone(*args):
+
+    if len(args) == 1:
+        name = args[0].capitalize()
+        if name in book.keys():
+            return str(book[name])
+            #return ", ".join([phone.value for phone in book[name].phones])
+        else:
+            return f"The {name} isn't in the database"
     else:
-        return f"The {name} isn't in the database"  
+        return f'Missed "Name" of the person'
     
 
 #=========================================================
 # >> add phone    Done
 # функція розширює новіми телефонами існуючий запис особи Mike   
-# >> add phone Mike +380509998877, +380732225566
+# >> add phone Mike +380509998877 +380732225566
 #=========================================================
+# не надо добавлять запятую
 @input_error
-def func_add_phone(prm):
-    count_prm = get_count_prm(prm)
-    
-    prm = prm.split(" ")
-    if prm[0] == "": return f'Missed "Name" of the person'
-    
-    if prm and (count_prm >= 2):
-        name = prm[0].lower().capitalize()
-        if name in book.keys():   
-            prm.remove(prm[0])  
-            if book[name].phones[0].value == "None": 
-                book[name].phones.clear()
-            
-            # перевіремо наявність телефонів у базі даних, які будемо додавати
-            for new_phone in prm:
-                new_phone = re.sub("\D", "", new_phone) # залишимо тільки цифри
-                new_phone = f"+{new_phone}" if not new_phone.startswith("+") else new_phone
-                for phone in book[name].phones:
-                    if phone.value == new_phone: raise PhoneException(f"The phone {phone.value} already exists")
-                     
-            # приберемо коми із телефонів    
-            lst_add_phones = list(map(lambda phone: Phone(re.sub(",", "", phone)), prm))
-            return book[name].add_phone(lst_add_phones)  # викликаємо Метод класу 
+def func_add_phone(*args):
+    print("func_add_phone")
+    if (len(args) >= 2):
+        name = args[0].capitalize()
+        if name in book.keys():
+            phones = args[1:]  
+            return book[name].add_phone([Phone(phone) for phone in phones])
         else:
             return f"The person [bold red]{name}[/bold red] isn't in a database"
-    else: return f"Expected 2 arguments, but {count_prm} was given.\nHer's an example >> add phone Mike +380509998877"
+    else: return f"Expected 2 arguments\nHer's an example >> add phone Mike +380509998877"
 
 
 #=========================================================
@@ -390,18 +341,13 @@ def func_add_phone(prm):
 # Example >> change birthday Mike 12.05.1990
 #=========================================================
 @input_error
-def func_change_birthday(prm):
-    count_prm = get_count_prm(prm)
-    prm = prm.split(" ")
-    if prm[0] == "": return f'Missed "Birthday" of the person'
-    
-    if prm and (count_prm >= 2):
-        name = prm[0].lower().capitalize()
+def func_change_birthday(*args):
+    if (len(args) == 2):
+        name = args[0].capitalize()
         if name in book.keys():
-            date = prm[1]
-            return book[name].change_birthday(Birthday(date))
+            return book[name].change_birthday(Birthday(args[1]))
         else: return f"The [bold red]{name}[/bold red] isn't in a database"
-    else: return f"Expected 2 arguments, but {count_prm} was given.\nHer's an example >> change birthday Mike 12.05.1990"
+    else: return f"Expected 2 arguments\nHer's an example >> change birthday Mike 12.05.1990"
 
 
 #=========================================================
@@ -410,60 +356,30 @@ def func_change_birthday(prm):
 # Example >> birthday Mike
 # Example >> birthday /365
 #=========================================================
+# виводити список контактів, у яких день народження через задану кількість днів від поточної дати
 @input_error
-def func_get_day_birthday(prm):
-    # порахуємо кількість параметрів
-    count_prm = get_count_prm(prm)
-    prm = prm.split(" ")
-    if prm[0] == "": return f'Missed [bold red]Name[/bold red] of the person'
-        
-    if prm and (count_prm >= 1):
-        if "/" in prm[0]:   # Example >> birthday /365
-            count_day = int(re.sub("\/", "",prm[0]))
-            if not count_day > 0: return f"Enter the number of days greater than zero"
-            return book.get_list_birthday(count_day)
-            
-        else: # Example >> birthday Mike
-            name = prm[0].lower().capitalize()
-            if name in book.keys():
-                if book[name].birthday.value == "None": return f"No [bold red]Birthday[/bold red] for {name}"
-                return book[name].days_to_birthday() 
-            else: return f"The [bold red]{name}[/bold red] isn't in a database"
-    else: return f"Expected 1 arguments, but {count_prm} was given.\nHer's an example >> birthday Mike"
-
+def func_get_birthday(*args):
+    if (len(args) == 1):
+        count_day = int(args[0])
+        return book.get_list_birthday(count_day)
 
 #=========================================================
 # >> del phone    Done
 # функція видаляє телефон або список телефонів в існуючому записі особи Mike   
-# >> del phone Mike +380509998877, +380732225566
-#=========================================================   
+# >> del phone Mike +380509998877 +380732225566
+#=========================================================  
+# Не надо добавлять запятую в конце каждого номера 
 @input_error 
-def func_del_phone(prm):
-    count_prm = get_count_prm(prm)
-    
-    prm = prm.split(" ")
-    if prm[0] == "": return f'Missed "Name" of the person'
-    
-    if prm and (count_prm >= 2):
-        name = prm[0].lower().capitalize()
+def func_del_phone(*args):
+    if (len(args) >= 2):
+        name = args[0].capitalize()
         if name in book.keys():
-            prm.remove(prm[0])  
-            
-            old_phone = re.sub("\D", "", prm[0]) # залишимо тільки цифри
-            old_phone = f"+{old_phone}" if not old_phone.startswith("+") else old_phone
-            # перевіремо наявність телефону що будемо видаляти із бази даних
-            number_exists = any(phone.value == old_phone for phone in book[name].phones)
-            if number_exists:
-                # приберемо коми із телефонів
-                # формуємо список  об'єктів Phone, тому що на майбутнє хочу реалізувати видалення декількох телефонів 
-                lst_del_phones = list(map(lambda phone: Phone(re.sub(",", "", phone)), prm)) 
-                return book[name].del_phone(lst_del_phones[0])
-            else:
-                return f"The phone {prm[0]} isn't in the database - [bold red]fail[/bold red]"
-            
+            # формуємо список  об'єктів Phone, тому що на майбутнє хочу реалізувати видалення декількох телефонів 
+            #lst_del_phones = list(map(lambda phone: Phone(phone), args)) 
+            return book[name].del_phone(Phone(args[1]))
         else:
             return f"The name {name} isn't in database - [bold red]fail[/bold red]"
-    else: return f"Expected 2 arguments, but {count_prm} was given.\nHer's an example >> del phone Mike +380509998877"
+    else: return f"Expected 2 arguments\nHer's an example >> del phone Mike +380509998877"
 
 
 #=========================================================
@@ -474,23 +390,19 @@ def func_del_phone(prm):
 #                      >> search none
 #=========================================================
 @input_error
-def  func_search(prm):
-    count_prm = get_count_prm(prm)
-    
-    prm = prm.split(" ")
-    if prm[0] == "": return f"[bold yellow]Enter search information[/bold yellow]"
+def func_search(*args):
     lst_result = []
     rec_str = ""
-    if prm and (count_prm >= 1):
+    if (len(args) == 1):
         for rec in book.values():
             rec_str = str(rec)
-            if prm[0].lower() in rec_str.lower():
+            if args[0].lower() in rec_str.lower():
                 lst_result.append(rec_str)
                 
         s = "\n".join([rec for rec in lst_result])
         if lst_result: return f"[bold green]Search results:[/bold green]\n{s}"
-        else: return f"No matches found for {prm[0]}"
-    else: return f"Expected 1 arguments, but {count_prm} was given.\nHer's an example >> search Mike"
+        else: return f"No matches found for {args[0]}"
+    else: return f"Expected 1 arguments, but {len(args)} was given.\nHer's an example >> search Mike"
     
     
 # =========================================================
@@ -500,14 +412,16 @@ def  func_search(prm):
 #                      >> sort C://Testfolder/testfolder
 #                      >> sort .Testfolder/testfolder
 # =========================================================
+# TODO: sort_main("")
 @input_error
-def func_sort(prm):
-    if prm[0] == "":
+def func_sort(*args):
+    if len(args) == 1:
+        return sort_main(args[0])
+    elif len(args) == 0:
+        return sort_main("")
+    else:
         return f"[bold yellow]Enter path[/bold yellow]"
-    return sort_main(prm)
-    # return f"[bold green]Sort {prm} finished:[/bold green]"
-    
-    
+
 #=========================================================
 # Функція читає базу даних з файлу - ОК
 #========================================================= 
@@ -518,36 +432,15 @@ def load_phoneDB(path):
 
 
 #=========================================================
-# Функція виконує збереження бази даних у файл *.csv - OK
+# Функція виконує збереження бази даних - OK
 #========================================================= 
 @input_error
 def save_phoneDB(path):
     return book.save_database(path_book)
-    
-    
-#=========================================================
-# Функція виконує парсер команд та відповідних параметрів
-#=========================================================
-def parcer_commands(cmd_line):
-    lst, tmp, cmd, prm  = [[], [], "", ""]
-    
-    if cmd_line:
-        tmp = cmd_line.split()
-        
-        # перевіремо ПОДВІЙНУ команду
-        if len(tmp) > 1 and f"{tmp[0]} {tmp[1]}".lower() in COMMANDS: #  add Mike 4589 94508
-            cmd = f"{tmp[0]} {tmp[1]}".lower()
-            prm = cmd_line.partition(cmd)[2].strip()
-            
-        # перевіремо ОДИНАРНУ команду
-        elif tmp[0].lower() in COMMANDS:
-            cmd = tmp[0].lower()
-            prm = cmd_line.partition(" ")[2]
-    return cmd, prm
 
 
 @input_error
-def func_help(_):
+def func_help(*args):
     return """[bold red]cls[/bold red] - очищення екрану від інформації
 [bold red]hello[/bold red] - вітання
 [bold red]good bye, close, exit[/bold red] - завершення програми
@@ -591,7 +484,7 @@ def func_help(_):
 """
     
 @input_error
-def clear_screen(_):
+def clear_screen(*args):
     os_name = platform.system().lower()
     
     if os_name == 'windows':
@@ -601,44 +494,84 @@ def clear_screen(_):
     return ""
 
 
-# Рахує та повертає кількість параметрів
-def get_count_prm(prm: list):
-    if len(prm) > 0: 
-        count_prm = prm.count(" ", 0, -1) + 1
-    else: count_prm = 0
-    return count_prm
+COMMANDS = {
+    func_exit: ("exit", "end", "bye",),
+    func_hello: ("hello", "hy", "welcome",),
+    func_new_rec: ("user+", "add+", "add-user", "new", ),
+    func_phone: ("phone",),
+    func_all_phone: ("show-all", "show_all", "showall"),
+    save_phoneDB: ("save",),
+    load_phoneDB: ("load",),
+    func_add_phone: ("add-phone", "add_phone",),
+    func_del_phone: ("del-phone", "del_phone"),
+    func_change_phone: ("edit-phone", "change-phone", "change_phone"),
+    func_book_pages: ("show-book", "show_book", "showbook"),
+    func_change_birthday: ("change-birthday", "change_birthday"),
+    func_get_birthday: ("birthday",),
+    func_help: ("help", "?",),
+    func_search: ("search", "find", "seek"),
+    func_sort: ("sort",),
+}
 
+COMMANDS_NOTES = {
+    note_add: ("note+", "note_add", "note-add", ),
+    note_del: ("note_del", "note-del",),
+    note_change: ("note_change", "note-change",),
+    note_find: ("note_find", "note-find",),
+    note_show: ("note_show", "note-show",),
+    note_sort: ("note_sort", "note-sort",), 
+}
 
-COMMANDS = ["good bye", "close", "exit",
-            "hello", "add", "phone", "show all", "save", "load", 
-            "cls", "add phone", "del phone", "change phone", "show book",
-            "change birthday", "birthday", "help", "search",
-            "note add", "note del", "note change", "note find", "note show", "note sort", "sort"]
+################################################################
+# implementation autocomplete function
+def complete(text, state):
+    results = []
+    if len(text) > 0:
+        for cmd, kwds in COMMANDS.items():
+            for kwd in kwds:
+                if kwd.lower().startswith(text):
+                    results.append(kwd)
+        for cmd, kwds in COMMANDS_NOTES.items():
+            for kwd in kwds:
+                if kwd.lower().startswith(text):
+                    results.append(kwd)
+    results.append(None)
+    return results[state]
+################################################################
+# set and bind autocomplete function 
+readline.parse_and_bind("tab: complete")
+readline.set_completer(complete)
+################################################################
 
-OPERATIONS = {"good bye": func_exit, "close": func_exit, "exit": func_exit,
-              "hello": func_greeting, 
-              "add": func_add_rec,
-              "phone": func_phone, 
-              "show all": func_all_phone,
-              "save": save_phoneDB,
-              "load": load_phoneDB,
-              "cls": clear_screen,
-              "add phone": func_add_phone,
-              "del phone": func_del_phone,              
-              "change phone": func_change_phone,
-              "show book": func_book_pages,
-              "change birthday": func_change_birthday,
-              "birthday": func_get_day_birthday,
-              "help": func_help,
-              "search": func_search,
-              "note add": note_add,
-              "note del": note_del,
-              "note change": note_change,
-              "note find": note_find,
-              "note show": note_show,
-              "note sort": note_sort, 
-              "sort": func_sort}
+def parser(text: str):
+    for cmd, kwds in COMMANDS.items():
+        for kwd in kwds:
+            if text.lower().startswith(kwd):
+                data = text[len(kwd):].strip().split()
+                return cmd, data
+
+    for cmd, kwds in COMMANDS_NOTES.items():
+        for kwd in kwds:
+            kwd += " "
+            if text.lower().startswith(kwd):
+                user_text = text[len(kwd):].lstrip()
+                if len(user_text) == 0: user_text = None
+                return cmd, [user_text]
+
+    return no_command, None
+
+def main():
+    print("[white]Run >> [/white][bold red]help[/bold red] - list of the commands")
+
+    while True:
+        user_input = input(">>>")
+        command, args = parser(user_input)
+        if args != None:
+            result = command(*args)
+        else:
+            result = command()
+        
+        if result: print(result)
 
 if __name__ == "__main__":
     main()
-    
