@@ -401,6 +401,17 @@ def func_del_phone(*args):
     else: return f"Expected 2 arguments\nHer's an example >> del phone Mike +380509998877"
 
 @input_error 
+def func_del_user(*args):
+    if (len(args) == 1):
+        name = args[0].capitalize()
+        if name in book.keys():
+            del book[name]
+            return f"{name} is deleted from the contact book"
+        else:
+            return f"The name {name} isn't in database - [bold red]fail[/bold red]"
+    else: return f"Expected 1 arguments\n"
+
+@input_error 
 def func_del_birthday(*args):
     if (len(args) == 1):
         name = args[0].capitalize()
@@ -530,6 +541,7 @@ COMMANDS = {
     func_exit: ("exit", "end", "bye",),
     func_hello: ("hello", "hy", "welcome",),
     func_new_rec: ("user+", "add+", "add-user", "new", ),
+    func_del_user: ("user-", "del-user", "delete-user", ),
     func_phone: ("phone",),
     func_show_all: ("show-all", "show_all", "showall"),
     func_add_phone: ("add-phone", "add_phone",),
