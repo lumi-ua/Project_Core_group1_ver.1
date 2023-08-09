@@ -55,7 +55,7 @@ def input_error(func):
 #=========================================================
 @input_error
 def note_add(args):
-    return note_book.add_note(args)
+    return note_book.create_note(args)
 
 @input_error
 def add_tags(args: str):

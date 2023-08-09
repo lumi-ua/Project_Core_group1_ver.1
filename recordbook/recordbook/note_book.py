@@ -59,7 +59,7 @@ class NoteBook(UserDict):
     def __init__(self):
         super().__init__()
         self.tags = dict() # dict(tag=str, Tag)
-        self.max = 1
+        self.max = 0
 
     def change_note(self, note_key: str, value: str):
         if note_key in self.data.keys():
@@ -92,10 +92,9 @@ class NoteBook(UserDict):
         # TODO:
         pass
 
-    def add_note(self, value: str):
-        key = str(self.max)
+    def create_note(self, value: str):
         self.max += 1
-        #str(datetime.now().replace(microsecond=0).timestamp())
+        key = str(self.max)
         note = Note(key, value)
         self.data[key] = note
         return f"Added new note, key={key}"
