@@ -63,8 +63,7 @@ def add_tags(args: str):
     if len(params) > 1:
         note_id = params[0]
         tags_list = params[1:]
-        note_book.add_tags(note_id, tags_list)
-        return "add_tags successfully"
+        return note_book.add_tags(note_id, tags_list)
     else: return "Expected > 1 params"
 
 @input_error
@@ -126,10 +125,12 @@ def note_find(args):
 def note_show(args):
     params = args.strip().split()
     if len(params) == 1:
-        note_id = params[0]
-        if note_id in note_book.keys():
-            note = note_book.data[note_id]
+        note_key = params[0]
+        if note_key in note_book.keys():
+            note = note_book.data[note_key]
             return str(note)
+        else:
+            print(f"note.key:{note_key} was not found")
     return ""
 
     if args.startswith("/") and args[1:].isdigit():

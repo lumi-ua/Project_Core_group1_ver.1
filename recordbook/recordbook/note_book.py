@@ -8,6 +8,8 @@ class Tag(Field):
     def __init__(self, value=None):        
         super().__init__(value)
         self.value = value
+
+        # список ключей тех ноутов, к которым тэг будет привязан
         self.notes = set()
         
     def __str__(self):
@@ -18,9 +20,14 @@ class Tag(Field):
     def __repr__(self):
         return str(self.value)
 
+    def sz(self):
+        return str(len(self.notes))
+
+    # добавляем ключ ноута в список ключей, тем самым делая привязку к ноуту 
     def link(self, note_key: str):
         self.notes.add(note_key)
 
+    # удаляем ключ ноута, тем самым удаляем связь к ноуту (отвязываем)
     def unlink(self, note_key: str):
         self.notes.remove(note_key)
 
@@ -29,13 +36,14 @@ class Note(Field):
     def __init__(self, key: str, value: str):
         super().__init__(value)
         self.value = value
-      
         self.key = key
+
+        # список тэгов, к которым будет привязан 
         self.tags = set()
 
     def __str__(self):
         result = f"{str(self.value)}\nkey: {str(self.key)}"
-        if len(self.tags): result += "\n#" + " #".join([tag for tag in self.tags])
+        if len(self.tags): result += "".join(["\n#" + tag for tag in self.tags])
         return result
     
     def unlink(self, tag_key: str):
@@ -61,16 +69,23 @@ class NoteBook(UserDict):
 
 
     def add_tags(self, note_key:str, tags_list:list):
+
+        # проверяем по ключу есть ли такой ноут
         if note_key in self.data.keys():
             note = self.data[note_key]
 
             for tag_key in tags_list:
+                # проверяем есть ли такой ключ в списке уже существующих
                 if tag_key not in self.tags.keys():
+                    # добавляем новый тэг по строке-ключу
                     self.tags[tag_key] = Tag(tag_key)
                 tag = self.tags[tag_key]
+                # привязываем к ноуту тэг
                 note.link(tag_key)
+                # привязываем к тэгу ноут
                 tag.link(note_key)
-        return "add_tags: Done"
+            return f"add_tags: successfully attached tags:{len(tags_list)}"
+        else: f"add_tags: wrong note.key={note_key}"
 
 
     def del_tags(self, note_id: str, tags_list: list):
