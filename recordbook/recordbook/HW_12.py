@@ -4,7 +4,7 @@ import os, sys
 import platform  # для clearscrean()
 from RecordBook import AddressBook, Record, Name, Phone, Email, Birthday, Address, PhoneException, BirthdayException, EmailException
 from clean import sort_main
-from note_book import NoteBook, NoteRecord, Note, Tag
+from note_book import NoteBook, Note, Tag
 from datetime import datetime
 import re
 import readline # pip install pyreadline3
@@ -55,14 +55,28 @@ def input_error(func):
 #=========================================================
 @input_error
 def note_add(args):
-    if args.rfind("#"):
-        n = args.rfind("#")  
-    key = str(datetime.now().replace(microsecond=0).timestamp())
-    note = Note(args.strip())
-    #tag = Tag(args[n:]) 
-    record = NoteRecord(key, note, tag=None)
-    return note_book.add_record(record)
+    return note_book.add_note(args)
 
+@input_error
+def add_tags(args: str):
+    params = args.strip().split()
+    if len(params) > 1:
+        note_id = params[0]
+        tags_list = params[1:]
+        note_book.add_tags(note_id, tags_list)
+        return "add_tags successfully"
+    else: return "Expected > 1 params"
+
+@input_error
+def del_tags(args: str):
+    params = args.strip().split()
+    if len(params) > 1:
+        note_id = params[0]
+        tags_list = params[1:]
+        print(f"{note_id}: {tags_list}")
+        note_book.del_tags(note_id, tags_list)
+        return "del_tags successfully"
+    else: return ""
 
 #=========================================================
 # >> note del <key-ідентифікатор запису>
@@ -70,13 +84,13 @@ def note_add(args):
 #=========================================================
 @input_error
 def note_del(args):
-    key = args.strip()
-    rec : NoteRecord = note_book.get(key)
-    try:
-        return note_book.del_record(rec)
-    except KeyError:
-        return f"Record {key} does not exist."
-            
+    params = args.strip().split()
+    if len(params) == 1:
+        try:
+            return note_book.del_note(params[0])
+        except KeyError:
+            return f"Note.key: {params[0]} does not exist."
+    
 
 #=========================================================
 # >> note change <key-record> <New notes> <tag>
@@ -84,24 +98,14 @@ def note_del(args):
 #=========================================================
 @input_error
 def note_change(args):
+    args = args.lstrip()
     n = args.find(" ")
-    key = args[:n]    
-    m = args.rfind("#")
-    if m == -1: 
-        note = Note(args[n+1:])
-        tag = None
-    if len(args[n:m]) == 1: 
-        note = None
-        tag = Tag(args[m:])
-    else:
-        note = Note(args[n+1:m])
-        tag = Tag(args[m:])
-    rec : NoteRecord = note_book.get(key)
-    if rec:
-        return rec.change_note(rec.note.value, note if note else rec.note.value, tag if tag else rec.tag.value)
-    else:
-        return f"Record does not exist"
-    
+    key = args[:n]
+    note_text = args[n+1:]
+    print(f"key:{key} txt:{note_text}")
+    result = note_book.change_note(key, note_text)
+    return result
+
 
 #=========================================================
 # >> note find <fragment>
@@ -120,6 +124,14 @@ def note_find(args):
 #=========================================================
 @input_error
 def note_show(args):
+    params = args.strip().split()
+    if len(params) == 1:
+        note_id = params[0]
+        if note_id in note_book.keys():
+            note = note_book.data[note_id]
+            return str(note)
+    return ""
+
     if args.startswith("/") and args[1:].isdigit():
         args = int(args[1:])
     else:
@@ -132,6 +144,15 @@ def note_show(args):
         input("\nFor next page press enter")
     return ""
 
+@input_error
+def tag_show(args):
+    params = args.strip().split()
+    if len(params) == 1:
+        tag_key = params[0]
+        if tag_key in note_book.tags.keys():
+            tag = note_book.tags[tag_key]
+            return str(tag)
+    return ""
 
 #=========================================================
 # >> note sort
@@ -153,7 +174,6 @@ def note_sort(args):
             input("\nFor next page press enter\n")
             count = 0
     return ""
-
 
 #=========================================================
 # >> add ...  DONE
@@ -567,6 +587,9 @@ COMMANDS_NOTES = {
     note_find: ("note_find", "note-find",),
     note_show: ("note_show", "note-show",),
     note_sort: ("note_sort", "note-sort",), 
+    add_tags: ("tags+", "add_tags", "add-tags",),
+    del_tags: ("tags-", "del_tags", "del-tags",),
+    tag_show: ("tag-show", "tag_show",)
 }
 
 ################################################################
@@ -606,7 +629,7 @@ def parser(text: str):
                 return cmd, [user_text]
 
     return no_command, None
-
+################################################################
 def main():
     print("[white]Run >> [/white][bold red]help[/bold red] - list of the commands")
     global path_book
@@ -621,6 +644,6 @@ def main():
             result = command()
         
         if result: print(result)
-
+################################################################
 if __name__ == "__main__":
     main()

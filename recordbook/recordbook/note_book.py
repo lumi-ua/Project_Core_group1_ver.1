@@ -1,92 +1,97 @@
 from collections import UserDict
 from datetime import datetime
 import json
+from RecordBook import Field
 
-class Tag:
+class Tag(Field):
+
     def __init__(self, value=None):        
-        self.__value = None
+        super().__init__(value)
         self.value = value
-        # каждый тэг хранит список всех ноутов, к которым он привязан
-        self.notes_list = list()  # list(Note)
-
-    def delete_note(self, key:str):
-        # удаляет по ключу ноут из списка ноутов
-        pass
+        self.notes = set()
         
     def __str__(self):
-        return str(self.value)
+        result = str(self.value)
+        if len(self.notes): result += "\nnote-keys: " + ", ".join([key for key in self.notes])
+        return result
     
     def __repr__(self):
         return str(self.value)
-    
-    @property
-    def value(self):
-        return self.__value
 
-    @value.setter
-    def value(self, value):
-        if value:
-            self.__value = value
+    def link(self, note_key: str):
+        self.notes.add(note_key)
 
-class Note(Tag):
-    pass
+    def unlink(self, note_key: str):
+        self.notes.remove(note_key)
 
-#class Key(Tag):
-#    pass
+class Note(Field):
 
-class NoteRecord():    
-    def __init__(self, key: str, note: Note=None, tag: Tag=None):        
+    def __init__(self, key: str, value: str):
+        super().__init__(value)
+        self.value = value
+      
         self.key = key
-        self.note = note
-        self.tag = tag # тут должен быть лист тэгов, которые к нему привязаны
+        self.tags = set()
 
     def __str__(self):
-        return f"{str(self.key)} {str(self.note if self.note else '')} {str(self.tag if self.tag else '')}"
+        result = f"{str(self.value)}\nkey: {str(self.key)}"
+        if len(self.tags): result += "\n#" + " #".join([tag for tag in self.tags])
+        return result
     
-    def __repr__(self):
-        return f"{str(self.key)} {str(self.note if self.note else '')} {str(self.tag if self.tag else '')}"
-                
-    def add_note(self, note: Note):
-        self.note = note
-        return f"Note {note} added."
-
-    def delete_tag(self, tag_key: str):
+    def unlink(self, tag_key: str):
         # удаляет тэг по ключу из списка своих тэгов
         pass
 
-    def del_note(self, note):
-        if note == self.note:
-            self.note = None
-        return f"Record Note {note} deleted"
+    def link(self, tag_key: str):
+        self.tags.add(tag_key)
 
-    def change_note(self, old_note: Note, new_note: Note, tag: Tag):
-        self.del_note(old_note)
-        self.add_note(new_note)
-        self.tag = tag        
-        return f"\nDeleted note: {old_note}\nNew note: {new_note}\nNew Tag: {self.tag}\n"
 
 class NoteBook(UserDict):
 
-    #def __init__(self):
-    #    # список всех ноутов, быстрый поиск по ключу, ключ=гарантия уникальности
-    #    self.notes_dict = dict() # dict(note.key, Note)
-    #    # список всех тэгов, быстрый поиск по ключу, где ключ - текст самого тэга, ключ - гарантия уникальности
-    #    self.tags_dict = dict() # dict(tag=str, Tag)
+    def __init__(self):
+        super().__init__()
+        self.tags = dict() # dict(tag=str, Tag)
+        self.max = 1
 
-    def attach_tags_list(note_key: str, tags_list: list):
-        # пробегаем по всем ключам входного списка тэгов
-        # проверяем есть ли у нас уже такой тэг, если нету - добавляем, если есть - находим
-        # найденному (или созданному) тэгу - добавляем ему в список note_key
-        # регистрируем ноут по его ключу, и добавляем ему каждый тэг
+    def change_note(self, note_key: str, value: str):
+        if note_key in self.data.keys():
+            note = self.data[note_key]
+            note.value = value   
+        #return f"\nDeleted note: {old_note}\nNew note: {new_note}\nNew Tag: {self.tag}\n"
+
+
+    def add_tags(self, note_key:str, tags_list:list):
+        if note_key in self.data.keys():
+            note = self.data[note_key]
+
+            for tag_key in tags_list:
+                if tag_key not in self.tags.keys():
+                    self.tags[tag_key] = Tag(tag_key)
+                tag = self.tags[tag_key]
+                note.link(tag_key)
+                tag.link(note_key)
+        return "add_tags: Done"
+
+
+    def del_tags(self, note_id: str, tags_list: list):
+        # TODO:
         pass
 
-    def add_record(self, record: NoteRecord):
-        self.data[record.key] = record
-        return f"\nAdded new record\nwith key: {record.key}\nNote: {record.note}\nTag: {record.tag}\n"
+    def add_note(self, value: str):
+        key = str(self.max)
+        self.max += 1
+        #str(datetime.now().replace(microsecond=0).timestamp())
+        note = Note(key, value)
+        self.data[key] = note
+        return f"Added new note, key={key}"
     
-    def del_record(self, record: NoteRecord):
-        result = self.data.pop(record.key)
-        return f"\nDeleted record \nwith key: {result.key}\nNote: {result.note}\nTag: {result.tag}\n"
+    def del_note(self, key: str):
+        if key in self.data.keys():
+            note = self.data.pop(key)
+            for tag in note.tags:
+                tag.unlink(key)
+            return f"\nDeleted Note.key: {note.key}\nNote: {note.value}\nTags: {len(note.tags)}"
+        return f"Wrong key={key} to delete Note"
         
     def iterator(self, group_size=15):
         records = list(self.data.values())
@@ -101,7 +106,7 @@ class NoteBook(UserDict):
     def save_data(self, filename):
         with open(filename, 'w') as f:
 
-            json.dump({str(record.key): (str(record.note  if record.note else ""), str(record.tag if record.tag else "")) for key, record in self.items()}, f, indent=4)
+            json.dump({str(note.key): (str(note.value  if note.value else ""), str(note.tag if note.tag else "")) for key, note in self.items()}, f, indent=4)
 
         return f"The note_book is saved."
 
@@ -143,15 +148,15 @@ class NoteBook(UserDict):
 if __name__ == "__main__":
 
     nb = NoteBook()
-    file_name = "n_book.json"
-    print(nb.load_data(file_name))
-    print(nb) 
+    #file_name = "n_book.json"
+    #print(nb.load_data(file_name))
+    #print(nb) 
 
-    key=datetime.now().replace(microsecond=0).timestamp()
-    note = Note('Create tag sorting')
-    rec = NoteRecord(key, note, Tag('Project'))
-    nb.add_record(rec)
+    #key=datetime.now().replace(microsecond=0).timestamp()
+    #note = Note('Create tag sorting')
+    #rec = NoteRecord(key, note, Tag('Project'))
+    #nb.add_record(rec)
 
-    print(nb.find_note('note'))
-    print(nb.save_data(file_name))
-    print(nb)
+    #print(nb.find_note('note'))
+    #print(nb.save_data(file_name))
+    #print(nb)

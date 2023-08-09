@@ -7,4 +7,5 @@ build/
 *eggs*
 *.bin
 *.json
-*log.txt
+*.txt
+*idea/
