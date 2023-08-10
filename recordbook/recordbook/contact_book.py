@@ -74,13 +74,26 @@ class Birthday(Field):
     def value(self, value: str):
         if value == None: 
             self.__value = None
-            # raise BirthdayException("Unauthorized birthday format")
         else:
             pattern = r"^\d{2}(\.|\-|\/)\d{2}\1\d{4}$"  # дозволені дати формату DD.MM.YYYY 
             if re.match(pattern, value):         # альтернатива для крапки: "-" "/"
                 self.__value = re.sub("[-/]", ".", value)  # комбінувати символи ЗАБОРОНЕНО DD.MM-YYYY 
             else: 
                 self.__value = None
+            # raise BirthdayException("Unauthorized birthday format")
+
+    # возвращает количество дней перед днём рождения
+    def days_to_birthday(self) -> int:
+        if self.value:
+            # возвращает количество дней до следующего дня рождения.
+            # если положительное то др еще не наступил, если отрицательное то уже прошел
+            current_date = datetime.now().date()
+
+            birthday = datetime.strptime(self.value, "%d.%m.%Y")
+            birthday = birthday.replace(year=current_date.year).date()
+            quantity_days = (birthday - current_date).days
+            return quantity_days
+        else: return -1
 
 
 class Address(Field):
@@ -173,28 +186,6 @@ class Record():
         self.phones[index]= new_phone
         return f"The person {self.name.value} has a new phone {new_phone.value} - [bold green]success[/bold green]"
     
-    # повертає кількість днів до наступного дня народження
-    def days_to_birthday(self):
-        if self.birthday.value:
-            now_date = datetime.now()
-            now_year = now_date.year
-            
-             # Определяем формат строки для Даты
-            date_format = "%d.%m.%Y %H:%M:%S"
-            # Строка с Датой народження
-            date_string = f"{self.birthday.value} 00:00:00"  
-            dt = datetime.strptime(date_string, date_format)
-            
-            birthday = datetime(day=dt.day, month=dt.month, year=now_year)
-            
-            if now_date > birthday:
-                birthday = birthday.replace(year=now_date.year + 1)
-                dif = (birthday - now_date).days
-                return f"до {birthday.strftime('%d.%m.%Y')} залишилося = {dif}"
-            else:
-                dif = (birthday - now_date).days
-                return f"до {birthday.strftime('%d.%m.%Y')} залишилося = {dif}"
-        else: return f"We have no information about {self.name.value}'s birthday."
     
     # перевіряє наявність 1(одного)телефону у списку
     def check_dublicate_phone(self, search_phone: str) ->bool:  
@@ -204,17 +195,14 @@ class Record():
 class AddressBook(UserDict):
 
     def get_list_birthday(self, count_day: int):
-        if count_day < 0: return []
-        end_date = datetime.now() + timedelta(days=int(count_day))
-        lst = [f"\nEnd date: {end_date.strftime('%d.%m.%Y')}"]
+        lst = []
+        if count_day < 0: return lst
         for name, person in self.items():
-            if not (person.birthday.value == "None"): 
-                person_date = datetime.strptime(person.birthday.value, "%d.%m.%Y").date()
-                person_month = person_date.month 
-                person_day = person_date.day 
-                dt = datetime(datetime.now().year, person_month, person_day) 
-                if end_date >= dt > datetime.now(): 
-                    lst.append(f"{name}|{person.birthday.value}|{', '.join(map(lambda phone: phone.value, person.phones))}")
+            if person.birthday != None:
+                days = person.birthday.days_to_birthday()
+
+                if (0 <= days) and (days <= count_day):
+                    lst.append(f"{name}|{person.birthday.value}")
         return "\n".join(lst)
        
     def add_record(self, record):
