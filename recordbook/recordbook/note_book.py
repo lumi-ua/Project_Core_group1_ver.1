@@ -124,19 +124,36 @@ class NoteBook(UserDict):
         return f"Wrong key={note_key} to delete Note"
         
     def iterator(self, group_size=15):
-        records = list(self.data.values())
+        notes = list(self.data.values())
         self.current_index = 0
 
-        while self.current_index < len(records):
-            group_items = records[self.current_index:self.current_index + group_size]
+        while self.current_index < len(notes):
+            group_items = notes[self.current_index:self.current_index + group_size]
             group = [rec for rec in group_items]
             self.current_index += group_size
             yield group
 
+    def find_note(self, fragment:str):
+        count = 0
+        result = ""
+        for rec in self.values():
+            line = str(rec) + "\n"
+            if fragment in line.lower():
+                result += line
+                count += 1
+        if result:
+            result = f"\nSearch result {str(count)} records:\nNotes:\n{result}Search string: {fragment}"
+        else:
+            result = f"No records was found for the fragment '{fragment}' \n"
+        return result
+
     def save_data(self, filename):
         with open(filename, 'w') as f:
 
-            json.dump({str(note.key): (str(note.value  if note.value else ""), str(note.tag if note.tag else "")) for key, note in self.items()}, f, indent=4)
+            json.dump({
+                str(note.key): (str(note.value  if note.value else ""),
+                str(note.tag if note.tag else "")) for key, note in self.items()}, 
+                f, indent=4)
 
         return f"The note_book is saved."
 
@@ -160,20 +177,6 @@ class NoteBook(UserDict):
         except FileNotFoundError:
             print(f"The file {filename} does not exist")
 
-
-    def find_note(self, fragment:str):
-        count = 0
-        result = ""
-        for rec in self.values():
-            line = str(rec) + "\n"
-            if fragment in line.lower():
-                result += line
-                count += 1
-        if result:            
-            result = f"\nSearch result {str(count)} records:\nNotes:\n{result}Search string: {fragment}"
-        else:
-            result = f"No records was found for the fragment '{fragment}' \n"
-        return result
     
 if __name__ == "__main__":
 
