@@ -72,8 +72,7 @@ def del_tags(args: str):
     if len(params) >= 1:
         note_id = params[0]
         tags_list = params[1:] if len(params) > 1 else None
-        note_book.del_tags(note_id, tags_list)
-        return "del_tags successfully"
+        return note_book.del_tags(note_id, tags_list)
     else: return ""
 
 #=========================================================

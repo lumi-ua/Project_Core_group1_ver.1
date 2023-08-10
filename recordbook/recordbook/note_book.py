@@ -5,7 +5,7 @@ from RecordBook import Field
 
 class Tag(Field):
 
-    def __init__(self, value=None):        
+    def __init__(self, value):        
         super().__init__(value)
         self.value = value
 
@@ -96,8 +96,7 @@ class NoteBook(UserDict):
             note = self.data[note_key]
 
             # если список тэгов пуст - удалим все тэги ноута
-            if tags_list==None: tags_list = note.tags
-            sz = len(tags_list)
+            if tags_list == None: tags_list = list(note.tags)
 
             for tag_key in tags_list:
                 # отвязываем от ноута тэг по ключу тэга
@@ -107,9 +106,9 @@ class NoteBook(UserDict):
                 tag.unlink(note_key)
                 # если тэг после отвязки не привязан не к одному ноуту - удаляем тэг
                 if tag.sz() == 0:
-                    self.tags.pop(tag_key)
+                    tag = self.tags.pop(tag_key)
 
-            return f"del_tags: successfully detached tags:{sz}"
+            return f"del_tags: successfully detached tags:{len(tags_list)}"
         else: return f"add_tags: wrong note.key={note_key}"
 
 
