@@ -110,7 +110,11 @@ def note_change(args):
 #=========================================================
 @input_error
 def note_find(args):
-    return note_book.find_note(args)
+    notes_list = note_book.find_notes(args)
+    if notes_list:
+        return f"Search result in notes: {len(notes_list)}"
+    else:
+        return f"No one notes was found for fragment: '{args}'"
 
 
 #=========================================================

@@ -133,18 +133,11 @@ class NoteBook(UserDict):
             self.current_index += group_size
             yield group
 
-    def find_note(self, fragment:str):
-        count = 0
-        result = ""
-        for rec in self.values():
-            line = str(rec) + "\n"
-            if fragment in line.lower():
-                result += line
-                count += 1
-        if result:
-            result = f"\nSearch result {str(count)} records:\nNotes:\n{result}Search string: {fragment}"
-        else:
-            result = f"No records was found for the fragment '{fragment}' \n"
+    def find_notes(self, fragment:str):
+        result = []
+        for note in self.values():
+            if note.value.lower().find(fragment.lower()) >= 0:
+                result.append(note.key)
         return result
 
     def save_data(self, filename: str):
