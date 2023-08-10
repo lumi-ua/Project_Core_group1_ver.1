@@ -69,10 +69,9 @@ def add_tags(args: str):
 @input_error
 def del_tags(args: str):
     params = args.strip().split()
-    if len(params) > 1:
+    if len(params) >= 1:
         note_id = params[0]
-        tags_list = params[1:]
-        print(f"{note_id}: {tags_list}")
+        tags_list = params[1:] if len(params) > 1 else None
         note_book.del_tags(note_id, tags_list)
         return "del_tags successfully"
     else: return ""
@@ -178,7 +177,7 @@ def note_sort(args):
 def notebook_show(args):
     print("notebook_show")
     for note in note_book.data.values():
-        print("[" + str(len(note.tags)) + "]:" + note.key)
+        print("[" + str(len(note.tags)) + "]: " + note.key)
     for tag in note_book.tags.values():
         print("[" + str(tag.sz()) + "]#" + tag.value)
     return ""
@@ -597,7 +596,7 @@ COMMANDS_NOTES = {
     #note_sort: ("note_sort", "note-sort",), 
     add_tags: ("tags+", "add_tags", "add-tags",),
     del_tags: ("tags-", "del_tags", "del-tags",),
-    tag_show: ("tag-show", "tag_show",),
+    #tag_show: ("tag-show", "tag_show",),
     notebook_show: ("notebook",),
 }
 

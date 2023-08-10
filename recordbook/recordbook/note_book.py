@@ -63,8 +63,9 @@ class NoteBook(UserDict):
     def change_note(self, note_key: str, value: str):
         if note_key in self.data.keys():
             note = self.data[note_key]
-            note.value = value   
-        #return f"\nDeleted note: {old_note}\nNew note: {new_note}\nNew Tag: {self.tag}\n"
+            note.value = value
+            return f"change_note: successfully note.key={note_key}"
+        else: return f"change_note: wrong note.key={note_key}"
 
 
     def add_tags(self, note_key:str, tags_list:list):
@@ -83,12 +84,15 @@ class NoteBook(UserDict):
                 # привязываем к тэгу ноут
                 tag.link(note_key)
             return f"add_tags: successfully attached tags:{len(tags_list)}"
-        else: f"add_tags: wrong note.key={note_key}"
+        else: return f"add_tags: wrong note.key={note_key}"
 
     def del_tags(self, note_key: str, tags_list: list):
         # проверяем по ключу есть ли такой ноут
         if note_key in self.data.keys():
             note = self.data[note_key]
+
+            if tags_list==None: tags_list = note.tags
+            sz = len(tags_list)
 
             for tag_key in tags_list:
                 note.unlink(tag_key)
@@ -97,8 +101,8 @@ class NoteBook(UserDict):
                 if tag.sz() == 0:
                     self.tags.pop(tag_key)
 
-            return f"del_tags: successfully detached tags:{len(tags_list)}"
-        else: f"add_tags: wrong note.key={note_key}"
+            return f"del_tags: successfully detached tags:{sz}"
+        else: return f"add_tags: wrong note.key={note_key}"
 
 
     def create_note(self, value: str):
