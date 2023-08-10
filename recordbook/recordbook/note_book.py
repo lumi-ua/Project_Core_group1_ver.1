@@ -1,7 +1,7 @@
 from collections import UserDict
 from datetime import datetime
 import json
-from RecordBook import Field
+from contact_book import Field
 
 class Tag(Field):
 
