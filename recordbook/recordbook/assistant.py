@@ -228,8 +228,13 @@ def func_show_all(*args)->str:
         table.add_column("Address", justify="center", style="red", no_wrap=True)
         
         console = Console()
-        result = [table.add_row(str(record.name.value), str(record.birthday), str(', '.join(map(lambda phone: phone.value, record.phones))), 
-            str(record.email), str(record.address)) for record in book.data.values()]        
+        result = [table.add_row(
+            str(record.name.value), 
+            str(record.birthday.value if record.birthday else "---"), 
+            str(', '.join(map(lambda phone: phone.value, record.phones))), 
+            str(record.email.value    if record.email    else "---"), 
+            str(record.address.value  if record.address  else "---")
+                ) for record in book.data.values()]        
         console.print(table)
         return ""
         

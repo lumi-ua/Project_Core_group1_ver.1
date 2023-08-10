@@ -139,15 +139,30 @@ class Record():
 
 
     def edit_birthday(self, birthday: Birthday):
-        self.birthday = birthday
+        if birthday.value:
+            self.birthday = birthday
+            return "bithday changed to: {birthday.value}"
+        # если None то интерпретируем как удаление всего поля
+        self.birthday = None
+        return "birthday successfully deleted"
 
-    def edit_email(self, email: Email): 
-        self.email = email
+    def edit_email(self, email: Email):
+        if email.value:
+            self.email = email
+            return "email changed to: {email.value}"
+        # если None то интерпретируем как удаление всего поля
+        self.email = None
+        return "email successfully deleted"
 
-    def edit_address(self, address: Address): 
-        self.address = address
+    def edit_address(self, address: Address):
+        if address.value:
+            self.address = address
+            return "address changed to: {address.value}"
+        # если None то интерпретируем как удаление всего поля
+        self.address = None
+        return "address successfully deleted"
 
-    def change_name(self, name:Name, new_name:Name) -> None: 
+    def change_name(self, name:Name, new_name:Name) -> None:
         if self.name.value == name.value: self.name = new_name
 
     def __str__(self) -> str:
