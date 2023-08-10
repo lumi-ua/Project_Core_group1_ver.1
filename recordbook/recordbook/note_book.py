@@ -95,11 +95,12 @@ class NoteBook(UserDict):
         if note_key in self.data.keys():
             note = self.data[note_key]
 
+            # если список тэгов пуст - удалим все тэги ноута
             if tags_list==None: tags_list = note.tags
             sz = len(tags_list)
 
             for tag_key in tags_list:
-                # отвязываем от ноута тэг
+                # отвязываем от ноута тэг по ключу тэга
                 note.unlink(tag_key)
                 tag = self.tags[tag_key]
                 # отвязываем от тэга ноут
@@ -126,7 +127,7 @@ class NoteBook(UserDict):
             # обрабатываем каждый тэг удаленного ноута
             for tag_key in note.tags:
                 tag = self.tags[tag_key]
-                # отвязываем тэг от удаленного ноута
+                # отвязываем тэг от удаленного ноута по ключу ноута
                 tag.unlink(note_key)
                 # если тэг после отвязки не привязан не к одному ноуту - удаляем тэг
                 if tag.sz() == 0:
