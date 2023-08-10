@@ -21,7 +21,7 @@ class Tag(Field):
         return str(self.value)
 
     def sz(self):
-        return str(len(self.notes))
+        return len(self.notes)
 
     # добавляем ключ ноута в список ключей, тем самым делая привязку к ноуту 
     def link(self, note_key: str):
@@ -47,8 +47,7 @@ class Note(Field):
         return result
     
     def unlink(self, tag_key: str):
-        # удаляет тэг по ключу из списка своих тэгов
-        pass
+        self.tags.remove(tag_key)
 
     def link(self, tag_key: str):
         self.tags.add(tag_key)
@@ -69,7 +68,6 @@ class NoteBook(UserDict):
 
 
     def add_tags(self, note_key:str, tags_list:list):
-
         # проверяем по ключу есть ли такой ноут
         if note_key in self.data.keys():
             note = self.data[note_key]
@@ -88,10 +86,6 @@ class NoteBook(UserDict):
         else: f"add_tags: wrong note.key={note_key}"
 
 
-    def del_tags(self, note_id: str, tags_list: list):
-        # TODO:
-        pass
-
     def create_note(self, value: str):
         self.max += 1
         key = str(self.max)
@@ -99,13 +93,16 @@ class NoteBook(UserDict):
         self.data[key] = note
         return f"Added new note, key={key}"
     
-    def del_note(self, key: str):
-        if key in self.data.keys():
-            note = self.data.pop(key)
-            for tag in note.tags:
-                tag.unlink(key)
-            return f"\nDeleted Note.key: {note.key}\nNote: {note.value}\nTags: {len(note.tags)}"
-        return f"Wrong key={key} to delete Note"
+    def del_note(self, note_key: str):
+        if note_key in self.data.keys():
+            note = self.data.pop(note_key)
+            for tag_str in note.tags:
+                tag = self.tags[tag_str]
+                tag.unlink(note_key)
+                if tag.sz() == 0:
+                    self.tags.pop(tag)
+            return f"Deleted Note.key: {note.key}\nNote: {note.value}\nTags: {len(note.tags)}"
+        return f"Wrong key={note_key} to delete Note"
         
     def iterator(self, group_size=15):
         records = list(self.data.values())

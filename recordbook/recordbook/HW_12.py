@@ -176,6 +176,13 @@ def note_sort(args):
             count = 0
     return ""
 
+@input_error
+def notebook_show(args):
+    print("notebook_show")
+    for tag in note_book.tags.values():
+        print("[" + str(tag.sz()) + "]#" + tag.value)
+    return ""
+
 #=========================================================
 # >> add ...  DONE
 # По этой команде бот сохраняет в памяти (в словаре например) новый контакт. 
@@ -586,11 +593,12 @@ COMMANDS_NOTES = {
     note_del: ("note_del", "note-del",),
     note_change: ("note_change", "note-change",),
     note_find: ("note_find", "note-find",),
-    note_show: ("note_show", "note-show",),
+    note_show: ("note_show", "note-show", "noteshow",),
     note_sort: ("note_sort", "note-sort",), 
     add_tags: ("tags+", "add_tags", "add-tags",),
     del_tags: ("tags-", "del_tags", "del-tags",),
-    tag_show: ("tag-show", "tag_show",)
+    tag_show: ("tag-show", "tag_show",),
+    notebook_show: ("notebook",),
 }
 
 ################################################################
@@ -623,7 +631,6 @@ def parser(text: str):
 
     for cmd, kwds in COMMANDS_NOTES.items():
         for kwd in kwds:
-            kwd += " "
             if text.lower().startswith(kwd):
                 user_text = text[len(kwd):].lstrip()
                 if len(user_text) == 0: user_text = None
