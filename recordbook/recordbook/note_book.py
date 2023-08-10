@@ -122,6 +122,16 @@ class NoteBook(UserDict):
                     self.tags.pop(tag_key)
             return f"Deleted Note.key: {note.key}\nNote: {note.value}\nTags: {len(note.tags)}"
         return f"Wrong key={note_key} to delete Note"
+
+    def get_tag_notes(self, tag_key: str):
+        if tag_key in self.tags.keys():
+            tag = self.tags[tag_key]
+            notes_list = []
+            for note_key in tag.notes:
+                note = self.data[note_key]
+                notes_list.append(f"Note[{note.key}]:{note.value}")
+            return notes_list
+        return []
         
     def iterator(self, group_size=15):
         notes = list(self.data.values())
@@ -145,7 +155,7 @@ class NoteBook(UserDict):
 
             json.dump({
                 str(note.key): (
-                    str(note.value  if note.value else ""),
+                    str(note.value if note.value else ""),
                     "".join([tag for tag in note.tags])) for key, note in self.items()}, 
                 f, indent=4)
 
