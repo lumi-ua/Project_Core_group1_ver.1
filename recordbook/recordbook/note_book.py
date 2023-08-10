@@ -147,12 +147,13 @@ class NoteBook(UserDict):
             result = f"No records was found for the fragment '{fragment}' \n"
         return result
 
-    def save_data(self, filename):
+    def save_data(self, filename: str):
         with open(filename, 'w') as f:
 
             json.dump({
-                str(note.key): (str(note.value  if note.value else ""),
-                str(note.tag if note.tag else "")) for key, note in self.items()}, 
+                str(note.key): (
+                    str(note.value  if note.value else ""),
+                    "".join([tag for tag in note.tags])) for key, note in self.items()}, 
                 f, indent=4)
 
         return f"The note_book is saved."

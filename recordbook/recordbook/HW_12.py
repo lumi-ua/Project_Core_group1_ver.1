@@ -304,10 +304,11 @@ def func_change_phone(*args):
 #=========================================================
 @input_error
 def func_exit(*args):
-    print("Good bye!")
     book.save_database(path_book)
+    #note_book.save_data(path_note)
+    print("Good bye!")
     exit(0)
-    return "Good bye!"
+    return ""
 
 
 #=========================================================
