@@ -23,11 +23,11 @@ class Tag(Field):
     def sz(self):
         return len(self.notes)
 
-    # добавляем ключ ноута в список ключей, тем самым делая привязку к ноуту 
+    # добавляем ключ-ссылку на ноут в список ключей, тем самым делаем привязку к ноуту
     def link(self, note_key: str):
         self.notes.add(note_key)
 
-    # удаляем ключ ноута, тем самым удаляем связь к ноуту (отвязываем)
+    # удаляем ключ-ссылку на ноут, тем самым удаляем связь к ноуту (отвязываем)
     def unlink(self, note_key: str):
         self.notes.remove(note_key)
 
@@ -45,12 +45,14 @@ class Note(Field):
         result = f"{str(self.value)}\nkey: {str(self.key)}"
         if len(self.tags): result += "".join(["\n#" + tag for tag in self.tags])
         return result
-    
-    def unlink(self, tag_key: str):
-        self.tags.remove(tag_key)
 
+    # добавляем ключ-ссылку на тэг в список ключей, тем самым делаем привязку к тэгу
     def link(self, tag_key: str):
         self.tags.add(tag_key)
+    
+    # удаляем ключ-ссылку на тэг, тем самым удаляем связь к тэгу (отвязываем)
+    def unlink(self, tag_key: str):
+        self.tags.remove(tag_key)
 
 
 class NoteBook(UserDict):
@@ -83,9 +85,11 @@ class NoteBook(UserDict):
                 note.link(tag_key)
                 # привязываем к тэгу ноут
                 tag.link(note_key)
+
             return f"add_tags: successfully attached tags:{len(tags_list)}"
         else: return f"add_tags: wrong note.key={note_key}"
 
+    # удаляем у ноута заданный список тэгов
     def del_tags(self, note_key: str, tags_list: list):
         # проверяем по ключу есть ли такой ноут
         if note_key in self.data.keys():
@@ -95,9 +99,12 @@ class NoteBook(UserDict):
             sz = len(tags_list)
 
             for tag_key in tags_list:
+                # отвязываем от ноута тэг
                 note.unlink(tag_key)
                 tag = self.tags[tag_key]
+                # отвязываем от тэга ноут
                 tag.unlink(note_key)
+                # если тэг после отвязки не привязан не к одному ноуту - удаляем тэг
                 if tag.sz() == 0:
                     self.tags.pop(tag_key)
 
@@ -106,6 +113,7 @@ class NoteBook(UserDict):
 
 
     def create_note(self, value: str):
+        # генерируем уникальный ключ=счётчик
         self.max += 1
         key = str(self.max)
         note = Note(key, value)
@@ -115,15 +123,19 @@ class NoteBook(UserDict):
     def del_note(self, note_key: str):
         if note_key in self.data.keys():
             note = self.data.pop(note_key)
+            # обрабатываем каждый тэг удаленного ноута
             for tag_key in note.tags:
                 tag = self.tags[tag_key]
+                # отвязываем тэг от удаленного ноута
                 tag.unlink(note_key)
+                # если тэг после отвязки не привязан не к одному ноуту - удаляем тэг
                 if tag.sz() == 0:
                     self.tags.pop(tag_key)
             return f"Deleted Note.key: {note.key}\nNote: {note.value}\nTags: {len(note.tags)}"
         return f"Wrong key={note_key} to delete Note"
 
-    def get_tag_notes(self, tag_key: str):
+    # получаем список у тэга список ноутов в развёрнутом текстовом формате
+    def get_tag_notes(self, tag_key: str) -> list:
         if tag_key in self.tags.keys():
             tag = self.tags[tag_key]
             notes_list = []
