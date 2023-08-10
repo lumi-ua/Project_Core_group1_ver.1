@@ -173,17 +173,13 @@ def notebook_show(args):
 
 #=========================================================
 # >> add ...  DONE
-# По этой команде бот сохраняет в памяти (в словаре например) новый контакт. 
-# Вместо ... пользователь вводит ИМЯ и НОМЕР телефона, обязательно через пробел.
+# Создаёт новый контакт
 # example >> add Mike 02.10.1990 +380504995876
 #=========================================================
 @input_error
 def func_new_rec(*args):
-
     count_prm = len(args)
-
     if (count_prm >= 2):
-        # Якщо ключ (ІМ'Я) що користувач хоче ДОДАТИ не ІСНУЄ тобто можемо додавати
         if not args[0].capitalize() in book.keys():
 
             name = args[0]
@@ -209,12 +205,7 @@ def func_new_rec(*args):
     else:
         return f"Expected 3 arguments, but {count_prm} was given.\nHer's an example >> add Mike 02.10.1990 +380504995876"
      
-     
-#=========================================================
-# >> show all         Done
-# По этой команде бот выводит все сохраненные контакты 
-# с номерами телефонов в консоль. 
-#=========================================================
+
 @input_error
 def func_show_all(*args)->str:
     if len(book.data) == 0: 
@@ -262,10 +253,7 @@ def func_book_pages(*args):
 
 #=========================================================
 # >> change phone... Done
-# По этой команде бот сохраняет в памяти новый номер телефона 
-# для существующего контакта. 
-# Вместо [...] пользователь вводит [Ім'я] [старий Номер телефона] [Новий номер], 
-# Увага: обязательно через пробел!!!
+# Изменяет номер телефона
 # >> change phone Mike +38099 +38050777
 #=========================================================
 @input_error 
@@ -284,11 +272,7 @@ def func_change_phone(*args):
     else: 
         return f"Expected 3 arguments, but {count_prm} was given.\nHer's an example >> change phone Mike +0449587612 +380995437856"
 
-#=========================================================
-# >> "good bye", "close", "exit"
-# По любой из этих команд бот завершает свою роботу 
-# после того, как выведет в консоль "Good bye!".
-#=========================================================
+
 @input_error
 def func_exit(*args):
     book.save_database(path_book)
@@ -297,10 +281,6 @@ def func_exit(*args):
     exit(0)
     return ""
 
-#=========================================================
-# >> hello
-# Отвечает в консоль "How can I help you?"
-#=========================================================
 @input_error
 def func_hello(*args):
     return "How can I help you?"
@@ -312,7 +292,7 @@ def no_command(*args):
 
 #=========================================================
 # >> phone ... Done
-# По этой команде бот выводит в консоль номер телефона для указанного контакта.
+# Выводит в консоль номера телефонов для указанного контакта.
 # Вместо ... пользователь вводит Имя контакта, чей номер нужно показать.
 # >> phone Ben
 #=========================================================
@@ -473,14 +453,14 @@ def func_search(*args):
     
 # =========================================================
 # >> sort    Done
-# функція викликає модул cleanfolder виконує сортування файлів у вказаній папці
+# сортування файлів у вказаній папці
 #              example >> sort Testfolder
 #                      >> sort C://Testfolder/testfolder
 #                      >> sort .Testfolder/testfolder
 # =========================================================
 # TODO: sort_main("")
 @input_error
-def func_sort(*args):
+def func_sort_files(*args):
     if len(args) == 1:
         return sort_main(args[0])
     elif len(args) == 0:
@@ -489,7 +469,6 @@ def func_sort(*args):
         return f"[bold yellow]Enter path[/bold yellow]"
 
 
-@input_error
 def func_help(*args):
     return """[bold red]cls[/bold red] - очищення екрану від інформації
 [bold red]hello[/bold red] - вітання
@@ -564,7 +543,7 @@ COMMANDS = {
     func_list_birthday: ("birthday",),
     func_help: ("help", "?",),
     func_search: ("search", "find", "seek"),
-    func_sort: ("sort",),
+    func_sort_files: ("sort",),
 }
 
 COMMANDS_NOTES = {
