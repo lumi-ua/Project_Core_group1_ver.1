@@ -594,7 +594,7 @@ COMMANDS_NOTES = {
     note_change: ("note_change", "note-change",),
     note_find: ("note_find", "note-find",),
     note_show: ("note_show", "note-show", "noteshow",),
-    note_sort: ("note_sort", "note-sort",), 
+    #note_sort: ("note_sort", "note-sort",), 
     add_tags: ("tags+", "add_tags", "add-tags",),
     del_tags: ("tags-", "del_tags", "del-tags",),
     tag_show: ("tag-show", "tag_show",),
