@@ -169,8 +169,7 @@ class NoteBook(UserDict):
                     note, tag = value
                     note = Note(note)
                     tag = Tag(tag)
-                    record = NoteRecord(key, note, tag)
-                    self.data[record.key] = record
+                    self.data[tag.key] = tag
 
             if isinstance(self.data, dict):
                 print(f"The Notebook is loaded.")
