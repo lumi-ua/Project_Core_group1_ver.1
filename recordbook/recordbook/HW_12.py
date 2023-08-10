@@ -85,10 +85,8 @@ def del_tags(args: str):
 def note_del(args):
     params = args.strip().split()
     if len(params) == 1:
-        try:
-            return note_book.del_note(params[0])
-        except KeyError:
-            return f"Note.key: {params[0]} does not exist."
+        return note_book.del_note(params[0])
+    else: return "Wrong params amount"
     
 
 #=========================================================
@@ -179,6 +177,8 @@ def note_sort(args):
 @input_error
 def notebook_show(args):
     print("notebook_show")
+    for note in note_book.data.values():
+        print("[" + str(len(note.tags)) + "]:" + note.key)
     for tag in note_book.tags.values():
         print("[" + str(tag.sz()) + "]#" + tag.value)
     return ""

@@ -85,6 +85,9 @@ class NoteBook(UserDict):
             return f"add_tags: successfully attached tags:{len(tags_list)}"
         else: f"add_tags: wrong note.key={note_key}"
 
+    def del_tags(self, note_id: str, tags_list: list):
+        # TODO:
+        pass
 
     def create_note(self, value: str):
         self.max += 1
@@ -100,7 +103,7 @@ class NoteBook(UserDict):
                 tag = self.tags[tag_str]
                 tag.unlink(note_key)
                 if tag.sz() == 0:
-                    self.tags.pop(tag)
+                    self.tags.pop(tag_str)
             return f"Deleted Note.key: {note.key}\nNote: {note.value}\nTags: {len(note.tags)}"
         return f"Wrong key={note_key} to delete Note"
         
