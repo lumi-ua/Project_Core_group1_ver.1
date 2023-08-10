@@ -237,12 +237,6 @@ def func_show_all(*args)->str:
                 ) for record in book.data.values()]        
         console.print(table)
         return ""
-        
-        # старий варіант друку таблиці
-        # result = ""
-        # result = "\n".join([f"{n}|{record.birthday.value}|{', '.join(map(lambda phone: phone.value, record.phones))}" for n, record in book.data.items()])
-        # if result == "": return "The database is empty"
-        # else: return result
     
 
 #=========================================================
@@ -290,7 +284,6 @@ def func_change_phone(*args):
     else: 
         return f"Expected 3 arguments, but {count_prm} was given.\nHer's an example >> change phone Mike +0449587612 +380995437856"
 
-
 #=========================================================
 # >> "good bye", "close", "exit"
 # По любой из этих команд бот завершает свою роботу 
@@ -304,7 +297,6 @@ def func_exit(*args):
     exit(0)
     return ""
 
-
 #=========================================================
 # >> hello
 # Отвечает в консоль "How can I help you?"
@@ -312,7 +304,6 @@ def func_exit(*args):
 @input_error
 def func_hello(*args):
     return "How can I help you?"
-
 
 @input_error
 def no_command(*args):
@@ -327,7 +318,6 @@ def no_command(*args):
 #=========================================================
 @input_error
 def func_phone(*args):
-
     if len(args) == 1:
         name = args[0].capitalize()
         if name in book.keys():
@@ -347,7 +337,6 @@ def func_phone(*args):
 # не надо добавлять запятую
 @input_error
 def func_add_phone(*args):
-    print("func_add_phone")
     if (len(args) >= 2):
         name = args[0].capitalize()
         if name in book.keys():
@@ -377,7 +366,6 @@ def func_change_email(*args):
     if (len(args) == 2):
         name = args[0].capitalize()
         if name in book.keys():
-            print(args[1])
             return book[name].edit_email(Email(args[1]))
         else: return f"The [bold red]{name}[/bold red] isn't in a database"
     else: return f"Expected 2 arguments\nHer's an example >> change birthday Mike 12.05.1990"

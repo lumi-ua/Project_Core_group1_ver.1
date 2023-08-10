@@ -6,7 +6,17 @@ import pickle
 from datetime import datetime
 from datetime import timedelta
 
-# батьківський клас
+
+class PhoneException(Exception):
+   """Phone wrong number exception"""
+
+class BirthdayException(Exception):
+   """Birthday wrong format exception"""
+
+class EmailException(Exception):
+   """Email wrong format exception"""
+
+
 class Field():
     def __init__(self, value) -> None:
         self.__value = None
@@ -79,8 +89,8 @@ class Birthday(Field):
             if re.match(pattern, value):         # альтернатива для крапки: "-" "/"
                 self.__value = re.sub("[-/]", ".", value)  # комбінувати символи ЗАБОРОНЕНО DD.MM-YYYY 
             else: 
-                self.__value = None
-            # raise BirthdayException("Unauthorized birthday format")
+                #self.__value = None
+                raise BirthdayException("Unauthorized birthday format")
 
     # возвращает количество дней перед днём рождения
     def days_to_birthday(self) -> int:
@@ -253,29 +263,3 @@ class AddressBook(UserDict):
             current_index += N
             yield batch
 
-class PhoneException(Exception):
-    def __init__(self, message):
-        self.__message = None
-        self.message = message
-        #super().__init__(self.message)
-    
-    def __str__(self):
-        return f"Attention: {self.message}"
-
-
-class BirthdayException(Exception):
-    def __init__(self, message):
-        self.__message = None
-        self.message = message
-    
-    def __str__(self):
-        return f"Attention: {self.message}"
-
-class EmailException(Exception):
-    def __init__(self, message):
-        self.__message = None
-        self.message = message
-    
-    def __str__(self):
-        return f"Attention: {self.message}"
-    
