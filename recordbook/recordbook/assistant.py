@@ -381,13 +381,11 @@ def func_change_address(*args):
 
 #=========================================================
 # >> birthday    Done
-# функція повертає кількість днів до Дня Народження особи    
-# Example >> birthday Mike
-# Example >> birthday /365
+# повертає список контактів, у яких день народження через задану кількість днів від поточної дати   
+# Example >> birthday 5
 #=========================================================
-# виводити список контактів, у яких день народження через задану кількість днів від поточної дати
 @input_error
-def func_get_birthday(*args):
+def func_list_birthday(*args):
     if (len(args) == 1):
         count_day = int(args[0])
         return book.get_list_birthday(count_day)
@@ -397,7 +395,6 @@ def func_get_birthday(*args):
 # функція видаляє телефон або список телефонів в існуючому записі особи Mike   
 # >> del phone Mike +380509998877 +380732225566
 #=========================================================  
-# Не надо добавлять запятую в конце каждого номера 
 @input_error 
 def func_del_phone(*args):
     if (len(args) == 2):
@@ -564,7 +561,7 @@ COMMANDS = {
     func_change_birthday: ("edit-birthday", "edit_birthday"),
     func_change_email: ("edit-email", "edit_email"),
     func_change_address: ("edit-address", "edit_address"),
-    func_get_birthday: ("birthday",),
+    func_list_birthday: ("birthday",),
     func_help: ("help", "?",),
     func_search: ("search", "find", "seek"),
     func_sort: ("sort",),
