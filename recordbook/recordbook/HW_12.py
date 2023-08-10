@@ -134,18 +134,6 @@ def note_show(args):
             print(f"note.key:{note_key} was not found")
     return ""
 
-    if args.startswith("/") and args[1:].isdigit():
-        args = int(args[1:])
-    else:
-        args = 5    
-    for page, rec in enumerate(note_book.iterator(args), 1):
-        print(f"Page {page}\n")
-        for item in rec:
-            print(f"{item}")
-        
-        input("\nFor next page press enter")
-    return ""
-
 @input_error
 def tag_show(args):
     params = args.strip().split()
