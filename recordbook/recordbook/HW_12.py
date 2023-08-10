@@ -179,9 +179,8 @@ def note_sort(args):
 
 @input_error
 def notebook_show(args):
-    print("notebook_show")
     for note in note_book.data.values():
-        print("[" + str(len(note.tags)) + "]: " + note.key)
+        print(f"[{(len(note.tags))}] {note.key}: " + note.value)
     for tag in note_book.tags.values():
         print("[" + str(tag.sz()) + "]#" + tag.value)
     return ""
