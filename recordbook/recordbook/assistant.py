@@ -67,7 +67,7 @@ def add_tags(args: str):
         note_id = params[0]
         tags_list = params[1:]
         return note_book.add_tags(note_id, tags_list)
-    else: return "Wrong arguments amount. Expected > 1 params"
+    else: raise ArgsAmountException("Wrong arguments amount. Expected > 1 params")
 
 @input_error
 def del_tags(args: str):
@@ -101,7 +101,7 @@ def note_change(args):
         if key.isdigit():
             note_text = args[n+1:]
             return note_book.change_note(key, note_text)
-        else: TypeError("Note.key wrong type")
+        else: raise TypeError("Note.key wrong type")
     else: raise ArgsAmountException("Unknown argument error")
 
 
@@ -181,7 +181,6 @@ def func_new_user(*args):
             name = args[0]
             new_name = Name(args[0].capitalize())
            
-            # TODO: refactor birthday-positioing
             new_birthday = Birthday(args[1])
 
             if new_birthday.value == None:
