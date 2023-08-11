@@ -36,6 +36,8 @@ def input_error(func):
             print(e)
         except EmailException as e:
             print(e)
+        except ArgsAmountException as e:
+            print(e)
         except FileNotFoundError:    # Файл бази даних Відсутній
             print("The database isn't found")
         except ValueError:
@@ -138,6 +140,7 @@ def tag_show(args):
     return ""
 
 #=========================================================
+# TODO: smart sorting
 # >> note-sort
 # Сортування нотаток по тегу
 #=========================================================
@@ -166,7 +169,6 @@ def notebook_show(args):
     return ""
 
 #=========================================================
-# >> add ...  DONE
 # Создаёт новый контакт
 # example >> add Mike 02.10.1990 +380504995876
 #=========================================================
@@ -228,7 +230,6 @@ def func_show_all(*args)->str:
 #=========================================================
 @input_error
 def func_book_pages(*args):
-    # Итерируемся по адресной книге и выводим представление для каждой записи
     n = int(re.sub("\D", "", args[0]))
     n_page = 0
     for batch in book._record_generator(N=n):
@@ -243,7 +244,6 @@ def func_book_pages(*args):
 
 
 #=========================================================
-# >> change phone... Done
 # Изменяет номер телефона
 # >> change-phone Mike +38099 +38050777
 #=========================================================
@@ -273,7 +273,6 @@ def no_command(*args):
     return func_hello(args=args)
 
 #=========================================================
-# >> phone ... Done
 # Выводит в консоль номера телефонов для указанного контакта.
 # >> phone Ben
 #=========================================================
@@ -286,7 +285,6 @@ def func_phone(*args):
 
 
 #=========================================================
-# >> add phone    Done
 # функція розширює новіми телефонами існуючий запис особи Mike   
 # >> add-phone Mike +380509998877 +380732225566
 #=========================================================
@@ -300,7 +298,6 @@ def func_add_phone(*args):
 
 
 #=========================================================
-# >> change birthday    Done
 # функція змінює день народження для особи    
 # Example >> change-birthday Mike 12.05.1990
 #=========================================================
@@ -326,7 +323,6 @@ def func_change_address(*args):
     else: raise ArgsAmountException("Wrong arguments amount. Expected 2 arguments")
 
 #=========================================================
-# >> birthday    Done
 # повертає список контактів, у яких день народження через задану кількість днів від поточної дати   
 # Example >> birthday 5
 #=========================================================
@@ -338,8 +334,7 @@ def func_list_birthday(*args):
     return book.get_list_birthday(count_day)
 
 #=========================================================
-# >> del phone    Done
-# функція видаляє телефон або список телефонів в існуючому записі особи Mike   
+# видаляє телефон або список телефонів в існуючому записі особи Mike   
 # >> del phone Mike +380509998877 +380732225566
 #=========================================================  
 @input_error 
@@ -387,7 +382,7 @@ def func_del_address(*args):
     else: raise ArgsAmountException("Wrong arguments amount. Expected 1 arguments")
 
 #=========================================================
-# >> search    Done
+# TODO: tuning
 # функція виконує пошук інформації у довідковій книзі
 #              example >> search Mike
 #                      >> search 38073
@@ -410,7 +405,6 @@ def func_search(*args):
     
     
 # =========================================================
-# >> sort    Done
 # сортування файлів у вказаній папці
 #              example >> sort Testfolder
 #                      >> sort C://Testfolder/testfolder
@@ -501,7 +495,7 @@ COMMANDS = {
     func_change_address: ("edit-address", "edit_address"),
     func_list_birthday: ("birthday",),
     func_help: ("help", "?",),
-    func_search: ("search", "find", "seek"),    #?
+    func_search: ("search", "find", "seek"),
     func_sort_files: ("sort",),
 }
 
