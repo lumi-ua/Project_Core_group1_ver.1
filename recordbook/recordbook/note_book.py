@@ -193,9 +193,8 @@ class NoteBook(UserDict):
             print(f"The file {filename} does not exist")
 
     
-if __name__ == "__main__":
-
-    nb = NoteBook()
+#if __name__ == "__main__":
+    #nb = NoteBook()
     #file_name = "n_book.json"
     #print(nb.load_data(file_name))
     #print(nb) 

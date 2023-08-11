@@ -207,7 +207,7 @@ class Record():
     def edit_phone(self, old_phone: Phone, new_phone: Phone) -> str:
         index = next((i for i, obj in enumerate(self.phones) if obj.value == old_phone.value), -1)
         self.phones[index]= new_phone
-        return f"The person {self.name.value} has a new phone {new_phone.value} - [bold green]success[/bold green]"
+        return f"User set new phone-number - [bold green]success[/bold green]"
     
     
     # перевіряє наявність 1(одного)телефону у списку

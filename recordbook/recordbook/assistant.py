@@ -7,7 +7,7 @@ from clean import sort_main
 from note_book import NoteBook, Note, Tag
 from datetime import datetime
 import re
-import readline # pip install pyreadline3
+import readline
 
 from rich import print
 from rich import box
@@ -19,6 +19,9 @@ path_note = Path(sys.path[0]).joinpath("note_book.json")
 
 book = AddressBook()
 note_book = NoteBook()
+
+class ArgsAmountException(Exception):
+   """Wrong arguments amount exception"""
         
 # Декоратор для Обробки командної строки
 def input_error(func):
@@ -48,9 +51,7 @@ def input_error(func):
 
 
 #=========================================================
-# Блок функцій для роботи з нотатками
-#=========================================================
-# >> note-add <текст нотатки будь-якої довжини> <teg-ключове слово> 
+# >> note-add <текст нотатки будь-якої довжини>
 # example >> note-add My first note in this bot.
 #=========================================================
 @input_error
@@ -64,7 +65,7 @@ def add_tags(args: str):
         note_id = params[0]
         tags_list = params[1:]
         return note_book.add_tags(note_id, tags_list)
-    else: return "Expected > 1 params"
+    else: return "Wrong arguments amount. Expected > 1 params"
 
 @input_error
 def del_tags(args: str):
@@ -76,49 +77,46 @@ def del_tags(args: str):
     else: return ""
 
 #=========================================================
-# >> note del <key-ідентифікатор запису>
-# example >> note del 1691245959.0
+# >> note-del <key>
 #=========================================================
 @input_error
 def note_del(args):
     params = args.strip().split()
     if len(params) == 1:
         return note_book.del_note(params[0])
-    else: return "Wrong params amount"
+    else: return "Wrong arguments amount. Expected 1 argument"
     
 
 #=========================================================
-# >> note change <key-record> <New notes> <tag>
-# example >> note change 1691245959.0 My new notes. #Tag 
+# >> note-change <key> <Text>
 #=========================================================
 @input_error
 def note_change(args):
     args = args.lstrip()
     n = args.find(" ")
-    key = args[:n]
-    note_text = args[n+1:]
-    print(f"key:{key} txt:{note_text}")
-    result = note_book.change_note(key, note_text)
-    return result
+    if n > 0:
+        key = args[:n]
+        if key.isdigit():
+            note_text = args[n+1:]
+            return note_book.change_note(key, note_text)
+        else: TypeError("Note.key wrong type")
+    else: raise ArgsAmountException("Unknown argument error")
 
 
 #=========================================================
-# >> note find <fragment>
-# Фрагмент має бути однією фразою без пробілів
-# example >> note find word
+# >> note-find <text-fragment>
 #=========================================================
 @input_error
 def note_find(args):
-    notes_list = note_book.find_notes(args)
-    if notes_list:
-        return f"Search result in notes: {len(notes_list)}"
+    key_list = note_book.find_notes(args.strip())
+    if key_list:
+        return f"Search result in notes: {str(key_list)}"
     else:
         return f"No one notes was found for fragment: '{args}'"
 
 
 #=========================================================
-# >> note show <int: необов'язковий аргумент кількості рядків>
-# Передається необов'язковий аргумент кількості рядків 
+# >> note-show <int: необов'язковий аргумент кількості рядків>
 # example >> note show 15
 #=========================================================
 @input_error
@@ -126,12 +124,8 @@ def note_show(args):
     params = args.strip().split()
     if len(params) == 1:
         note_key = params[0]
-        if note_key in note_book.keys():
-            note = note_book.data[note_key]
-            return str(note)
-        else:
-            print(f"note.key:{note_key} was not found")
-    return ""
+        return str(note_book.data[note_key])
+    else: raise ArgsAmountException("Wrong arguments amount. Expected 1 argument")
 
 @input_error
 def tag_show(args):
@@ -140,18 +134,18 @@ def tag_show(args):
         tag_key = params[0]
         notes_list = note_book.get_tag_notes(tag_key)
         for n in notes_list: print(n)
+    else: raise ArgsAmountException("Wrong arguments amount. Expected 1 argument")
     return ""
 
 #=========================================================
-# >> note sort
+# >> note-sort
 # Сортування нотаток по тегу
-# example >> note sort
 #=========================================================
 @input_error
 def note_sort(args):    
     result = []
-    for rec in note_book.values():
-        line = f"{rec.tag}  {rec.note}  {rec.key}"
+    for note in note_book.values():
+        line = f"{note.value}"
         result.append(line)
     result.sort()
     count = 0
@@ -197,13 +191,11 @@ def func_new_user(*args):
                 lst_phones = list(map(lambda phone: Phone(phone.strip()), args))
                 rec = Record(name=new_name, birthday=new_birthday, phones=lst_phones)
                 book.add_record(rec)
-            else:
-                raise PhoneException("Phone absent in arguments")
+            else: raise PhoneException("Phone absent in arguments")
             
             return "1 record was successfully added - [bold green]success[/bold green]"
-        else: return "The person is already in database"  # Повернемо помилку -> "Неможливо дадати існуючу людину"
-    else:
-        return f"Expected 3 arguments, but {count_prm} was given.\nHer's an example >> add Mike 02.10.1990 +380504995876"
+        else: return "The person is already in database"
+    else: return "Wrong arguments amount. Expected 3 arguments"
      
 
 @input_error
@@ -228,11 +220,10 @@ def func_show_all(*args)->str:
                 ) for record in book.data.values()]        
         console.print(table)
         return ""
-    
 
 #=========================================================
-# >> show book /N
-# Команда "show book" друкує книгу контактів по N записів
+# >> show-book /N
+# Команда "show-book" друкує книгу контактів по N записів
 # де N - це кількість записів на одній сторінці
 #=========================================================
 @input_error
@@ -254,23 +245,14 @@ def func_book_pages(*args):
 #=========================================================
 # >> change phone... Done
 # Изменяет номер телефона
-# >> change phone Mike +38099 +38050777
+# >> change-phone Mike +38099 +38050777
 #=========================================================
 @input_error 
 def func_change_phone(*args):
-    # порахуємо кількість параметрів
-    count_prm = len(args)
-
-    if (count_prm >= 3):
+    if (len(args) == 3):
         name = args[0].capitalize()
-
-        if name in book.keys():
-            if args[1].isdigit() and args[2].isdigit():   # old_phone = None
-                return book[name].edit_phone(Phone(args[1]), Phone(args[2]))
-        else:
-            return f"The record {name} wasn't found in the database - [bold red]fail[/bold red]"
-    else: 
-        return f"Expected 3 arguments, but {count_prm} was given.\nHer's an example >> change phone Mike +0449587612 +380995437856"
+        return book[name].edit_phone(Phone(args[1]), Phone(args[2]))
+    else: raise ArgsAmountException("Wrong arguments amount. Expected 3 arguments")
 
 
 @input_error
@@ -293,71 +275,55 @@ def no_command(*args):
 #=========================================================
 # >> phone ... Done
 # Выводит в консоль номера телефонов для указанного контакта.
-# Вместо ... пользователь вводит Имя контакта, чей номер нужно показать.
 # >> phone Ben
 #=========================================================
 @input_error
 def func_phone(*args):
     if len(args) == 1:
         name = args[0].capitalize()
-        if name in book.keys():
-            return str(book[name])
-            #return ", ".join([phone.value for phone in book[name].phones])
-        else:
-            return f"The {name} isn't in the database"
-    else:
-        return f'Missed "Name" of the person'
-    
+        return str(book[name])
+    else: raise ArgsAmountException('Wrong arguments amount. Missed "Name" of the person')
+
 
 #=========================================================
 # >> add phone    Done
 # функція розширює новіми телефонами існуючий запис особи Mike   
-# >> add phone Mike +380509998877 +380732225566
+# >> add-phone Mike +380509998877 +380732225566
 #=========================================================
-# не надо добавлять запятую
 @input_error
 def func_add_phone(*args):
     if (len(args) >= 2):
         name = args[0].capitalize()
-        if name in book.keys():
-            phones = args[1:]  
-            return book[name].add_phone([Phone(phone) for phone in phones])
-        else:
-            return f"The person [bold red]{name}[/bold red] isn't in a database"
-    else: return f"Expected 2 arguments\nHer's an example >> add phone Mike +380509998877"
+        phones = args[1:]  
+        return book[name].add_phone([Phone(phone) for phone in phones])
+    else: raise ArgsAmountException("Wrong arguments amount. Expected 2 arguments")
 
 
 #=========================================================
 # >> change birthday    Done
 # функція змінює день народження для особи    
-# Example >> change birthday Mike 12.05.1990
+# Example >> change-birthday Mike 12.05.1990
 #=========================================================
 @input_error
 def func_change_birthday(*args):
     if (len(args) == 2):
         name = args[0].capitalize()
-        if name in book.keys():
-            return book[name].edit_birthday(Birthday(args[1]))
-        else: return f"The [bold red]{name}[/bold red] isn't in a database"
-    else: return f"Expected 2 arguments\nHer's an example >> change birthday Mike 12.05.1990"
+        return book[name].edit_birthday(Birthday(args[1]))
+    else: raise ArgsAmountException("Wrong arguments amount. Expected 2 arguments")
 
 @input_error
 def func_change_email(*args):
     if (len(args) == 2):
         name = args[0].capitalize()
-        if name in book.keys():
-            return book[name].edit_email(Email(args[1]))
-        else: return f"The [bold red]{name}[/bold red] isn't in a database"
-    else: return f"Expected 2 arguments\nHer's an example >> change birthday Mike 12.05.1990"
+        return book[name].edit_email(Email(args[1]))
+    else: raise ArgsAmountException("Wrong arguments amount. Expected 2 arguments")
 
 @input_error
 def func_change_address(*args):
     if (len(args) == 2):
         name = args[0].capitalize()
-        if name in book.keys():
-            return book[name].edit_address(Address(args[1]))
-        else: return f"The [bold red]{name}[/bold red] isn't in a database"
-    else: return f"Expected 2 arguments\nHer's an example >> change birthday Mike 12.05.1990"
+        return book[name].edit_address(Address(args[1]))
+    else: raise ArgsAmountException("Wrong arguments amount. Expected 2 arguments")
 
 #=========================================================
 # >> birthday    Done
@@ -366,9 +332,10 @@ def func_change_address(*args):
 #=========================================================
 @input_error
 def func_list_birthday(*args):
+    count_day = 0
     if (len(args) == 1):
         count_day = int(args[0])
-        return book.get_list_birthday(count_day)
+    return book.get_list_birthday(count_day)
 
 #=========================================================
 # >> del phone    Done
@@ -379,60 +346,45 @@ def func_list_birthday(*args):
 def func_del_phone(*args):
     if (len(args) == 2):
         name = args[0].capitalize()
-        if name in book.keys():
-            # формуємо список  об'єктів Phone, тому що на майбутнє хочу реалізувати видалення декількох телефонів 
-            #lst_del_phones = list(map(lambda phone: Phone(phone), args)) 
-            return book[name].del_phone(Phone(args[1]))
-        else:
-            return f"The name {name} isn't in database - [bold red]fail[/bold red]"
-    else: return f"Expected 2 arguments\nHer's an example >> del phone Mike +380509998877"
+        # формуємо список  об'єктів Phone, тому що на майбутнє хочу реалізувати видалення декількох телефонів 
+        #lst_del_phones = list(map(lambda phone: Phone(phone), args)) 
+        return book[name].del_phone(Phone(args[1]))
+    else: raise ArgsAmountException("Wrong arguments amount. Expected 2 arguments")
 
 @input_error 
 def func_rename_user(*args):
     if (len(args) == 2):
         return book.rename_record(args[0].capitalize(), args[1].capitalize())
-    else: return f"Expected 2 arguments"
+    else: raise ArgsAmountException("Wrong arguments amount. Expected 2 arguments")
 
 @input_error 
 def func_del_user(*args):
     if (len(args) == 1):
         name = args[0].capitalize()
-        if name in book.keys():
-            del book[name]
-            return f"{name} is deleted from the contact book"
-        else:
-            return f"The name {name} isn't in database - [bold red]fail[/bold red]"
-    else: return f"Expected 1 arguments\n"
+        del book[name]
+        return f"{name} is deleted from the contact book"
+    else: raise ArgsAmountException("Wrong arguments amount. Expected 1 arguments")
 
 @input_error 
 def func_del_birthday(*args):
     if (len(args) == 1):
         name = args[0].capitalize()
-        if name in book.keys():
-            return book[name].edit_birthday(Birthday(None))
-        else:
-            return f"The name {name} isn't in database - [bold red]fail[/bold red]"
-    else: return f"Expected 1 arguments"
+        return book[name].edit_birthday(Birthday(None))
+    else: raise ArgsAmountException("Wrong arguments amount. Expected 1 arguments")
 
 @input_error 
 def func_del_email(*args):
     if (len(args) == 1):
         name = args[0].capitalize()
-        if name in book.keys():
-            return book[name].edit_email(Email(None))
-        else:
-            return f"The name {name} isn't in database - [bold red]fail[/bold red]"
-    else: return f"Expected 1 arguments"
+        return book[name].edit_email(Email(None))
+    else: raise ArgsAmountException("Wrong arguments amount. Expected 1 arguments")
 
 @input_error 
 def func_del_address(*args):
     if (len(args) == 1):
         name = args[0].capitalize()
-        if name in book.keys():
-            return book[name].edit_address(Address(None))
-        else:
-            return f"The name {name} isn't in database - [bold red]fail[/bold red]"
-    else: return f"Expected 1 arguments"
+        return book[name].edit_address(Address(None))
+    else: raise ArgsAmountException("Wrong arguments amount. Expected 1 arguments")
 
 #=========================================================
 # >> search    Done
@@ -454,7 +406,7 @@ def func_search(*args):
         s = "\n".join([rec for rec in lst_result])
         if lst_result: return f"[bold green]Search results:[/bold green]\n{s}"
         else: return f"No matches found for {args[0]}"
-    else: return f"Expected 1 arguments, but {len(args)} was given.\nHer's an example >> search Mike"
+    else: raise ArgsAmountException("Wrong arguments amount. Expected 1 arguments")
     
     
 # =========================================================
@@ -549,7 +501,7 @@ COMMANDS = {
     func_change_address: ("edit-address", "edit_address"),
     func_list_birthday: ("birthday",),
     func_help: ("help", "?",),
-    func_search: ("search", "find", "seek"),
+    func_search: ("search", "find", "seek"),    #?
     func_sort_files: ("sort",),
 }
 
@@ -559,7 +511,7 @@ COMMANDS_NOTES = {
     note_change: ("note_change", "note-change",),
     note_find: ("note_find", "note-find",),
     note_show: ("note_show", "note-show", "noteshow",),
-    #note_sort: ("note_sort", "note-sort",), 
+    #note_sort: ("note_sort", "note-sort",),    #? 
     add_tags: ("tags+", "add_tags", "add-tags",),
     del_tags: ("tags-", "del_tags", "del-tags",),
     tag_show: ("tag-show", "tag_show",),
