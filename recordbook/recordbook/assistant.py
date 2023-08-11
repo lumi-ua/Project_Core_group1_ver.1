@@ -177,7 +177,7 @@ def notebook_show(args):
 # example >> add Mike 02.10.1990 +380504995876
 #=========================================================
 @input_error
-def func_new_rec(*args):
+def func_new_user(*args):
     count_prm = len(args)
     if (count_prm >= 2):
         if not args[0].capitalize() in book.keys():
@@ -388,6 +388,12 @@ def func_del_phone(*args):
     else: return f"Expected 2 arguments\nHer's an example >> del phone Mike +380509998877"
 
 @input_error 
+def func_rename_user(*args):
+    if (len(args) == 2):
+        return book.rename_record(args[0].capitalize(), args[1].capitalize())
+    else: return f"Expected 2 arguments"
+
+@input_error 
 def func_del_user(*args):
     if (len(args) == 1):
         name = args[0].capitalize()
@@ -526,7 +532,8 @@ def clear_screen(*args):
 COMMANDS = {
     func_exit: ("exit", "end", "bye",),
     func_hello: ("hello", "hy", "welcome",),
-    func_new_rec: ("user+", "add+", "add-user", "new", ),
+    func_new_user: ("user+", "add+", "add-user", "new", ),
+    func_rename_user: ("rename",),
     func_del_user: ("user-", "del-user", "delete-user", ),
     func_phone: ("phone",),
     func_show_all: ("show-all", "show_all", "showall"),

@@ -89,8 +89,9 @@ class Birthday(Field):
             if re.match(pattern, value):         # альтернатива для крапки: "-" "/"
                 self.__value = re.sub("[-/]", ".", value)  # комбінувати символи ЗАБОРОНЕНО DD.MM-YYYY 
             else: 
-                #self.__value = None
-                raise BirthdayException("Unauthorized birthday format")
+                self.__value = None
+                # устанавливаем None - для валидации 
+                #raise BirthdayException("Unauthorized birthday format")
 
     # возвращает количество дней перед днём рождения
     def days_to_birthday(self) -> int:
@@ -172,9 +173,6 @@ class Record():
         self.address = None
         return "address successfully deleted"
 
-    def change_name(self, name:Name, new_name:Name) -> None:
-        if self.name.value == name.value: self.name = new_name
-
     def __str__(self) -> str:
         result = f"{', '.join(map(lambda phone: phone.value, self.phones))}"
         if self.birthday.value != None:
@@ -233,6 +231,12 @@ class AddressBook(UserDict):
     def add_record(self, record):
         self.data[record.name.value] = record
         return "1 record was successfully added - [bold green]success[/bold green]"
+
+    def rename_record(self, old_name: str, new_name: str):
+        rec = self.data.pop(old_name)
+        rec.name.value = new_name
+        self.data[new_name] = rec
+        return f"successfully renamed from:{old_name} to:{new_name}"
     
     # завантаження записів книги із файлу
     def load_database(self, path):
