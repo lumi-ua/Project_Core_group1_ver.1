@@ -257,7 +257,7 @@ def func_change_phone(*args):
 @input_error
 def func_exit(*args):
     book.save_database(path_book)
-    #note_book.save_data(path_note)
+    #note_book.save_to_file(path_note)
     print("Good bye!")
     exit(0)
     return ""
@@ -550,8 +550,9 @@ def parser(text: str):
 ################################################################
 def main():
     print("[white]Run >> [/white][bold red]help[/bold red] - list of the commands")
-    global path_book
+    global path_book, path_note
     book.load_database(path_book)
+    #note_book.load_file(path_note)
 
     while True:
         user_input = input(">>>")

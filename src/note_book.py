@@ -1,6 +1,7 @@
 from collections import UserDict
 from datetime import datetime
 import json
+import pickle
 from contact_book import Field
 
 class Tag(Field):
@@ -194,7 +195,7 @@ class NoteBook(UserDict):
                 result.append(note.key)
         return result
 
-    def save_data(self, filename: str):
+    def save_to_file(self, filename: str):
         with open(filename, 'w') as f:
 
             json.dump({
@@ -205,7 +206,7 @@ class NoteBook(UserDict):
 
         return f"The note_book is saved."
 
-    def load_data(self, filename):
+    def load_file(self, filename):
         try:
             with open(filename, 'r') as f:
                 data_dict = json.load(f)
@@ -224,18 +225,3 @@ class NoteBook(UserDict):
         except FileNotFoundError:
             print(f"The file {filename} does not exist")
 
-    
-#if __name__ == "__main__":
-    #nb = NoteBook()
-    #file_name = "n_book.json"
-    #print(nb.load_data(file_name))
-    #print(nb) 
-
-    #key=datetime.now().replace(microsecond=0).timestamp()
-    #note = Note('Create tag sorting')
-    #rec = NoteRecord(key, note, Tag('Project'))
-    #nb.add_record(rec)
-
-    #print(nb.find_note('note'))
-    #print(nb.save_data(file_name))
-    #print(nb)
