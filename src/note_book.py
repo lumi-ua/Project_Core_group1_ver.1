@@ -109,7 +109,7 @@ class NoteBook(UserDict):
                     tag = self.tags.pop(tag_key)
 
             return f"del_tags: successfully detached tags:{len(tags_list)}"
-        else: return f"add_tags: wrong note.key={note_key}"
+        else: return f"del_tags: wrong note.key={note_key}"
 
 
     def create_note(self, value: str):
@@ -156,18 +156,23 @@ class NoteBook(UserDict):
                     tag_list.append(tag.value)
         # сортируем найденные тэги по их тексту
         tag_list = sorted(tag_list)
+        note_list = []
 
-        # формируем по найденным тэгам список ключей привязанных к ним ноутов
-        # исспользуем множество set(int) для ключей ноутов, чтобы исключить дубли, 
+        # формируем по найденным тэгам список ключей, привязанных к этим ноутам
+        # исспользуем множество set(int), чтобы исключить дубли ключей, 
         # потому как к разным найденным тэгам может быть привязан один и тот-же ноут
         note_ids = set()
+
+        # проходим по списку в том порядке, в котором они были отсортированы
         for tag_str in tag_list:
             # получаем тэг по ключу
             tag = self.tags[tag_str]
+            for id in tag.notes:
+                if id not in note_ids:
+                    # заполняем финальный список ноутов
+                    note_list.append(self.data[id])
+            # заполняем ноутами чтобы устранять дубликаты
             note_ids.update(tag.notes)
-
-        # формируем финальный список ноутов из множества с индексами
-        note_list = [self.data[id] for id in note_ids]
 
         print(f"search_notes_by_text:\"{text}\" in tags={len(tag_list)}, for notes={len(note_list)}")
         return note_list

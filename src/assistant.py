@@ -52,8 +52,7 @@ def input_error(func):
     return wrapper
 
 #=========================================================
-# >> note-add <текст нотатки будь-якої довжини>
-# example >> note-add My first note in this bot.
+# >> note+ My first note in this bot.
 #=========================================================
 @input_error
 def note_add(args):
@@ -68,6 +67,10 @@ def add_tags(args: str):
         return note_book.add_tags(note_id, tags_list)
     else: raise ArgsAmountException("Wrong arguments amount. Expected > 1 params")
 
+#=========================================================
+# >> tags- <key>
+# >> tags- <key> <tag> ...
+#=========================================================
 @input_error
 def del_tags(args: str):
     params = args.strip().split()
@@ -86,7 +89,6 @@ def note_del(args):
     if len(params) == 1:
         return note_book.del_note(params[0])
     else: return "Wrong arguments amount. Expected 1 argument"
-    
 
 #=========================================================
 # >> note-change <key> <Text>
