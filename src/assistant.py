@@ -15,7 +15,7 @@ from rich.table import Table
 from rich.console import Console
 
 path_book = Path(sys.path[0]).joinpath("user_book.bin")
-path_note = Path(sys.path[0]).joinpath("note_book.json")
+path_note = Path(sys.path[0]).joinpath("note_book.bin")
 
 book = AddressBook()
 note_book = NoteBook()
@@ -41,7 +41,7 @@ def input_error(func):
         except FileNotFoundError:    # Файл бази даних Відсутній
             print("The database isn't found")
         except ValueError:
-            print("Incorect data or unsupported format while writing to the file")
+            print("Incorect data or unsupported format for file")
         except KeyError:
             print("Record isn't in the database")
         except KeyboardInterrupt:
@@ -257,7 +257,7 @@ def func_change_phone(*args):
 @input_error
 def func_exit(*args):
     book.save_database(path_book)
-    #note_book.save_to_file(path_note)
+    note_book.save_to_file(path_note)
     print("Good bye!")
     exit(0)
     return ""
@@ -550,9 +550,10 @@ def parser(text: str):
 ################################################################
 def main():
     print("[white]Run >> [/white][bold red]help[/bold red] - list of the commands")
-    global path_book, path_note
+    global path_book
+    global path_note
     book.load_database(path_book)
-    #note_book.load_file(path_note)
+    note_book.load_file(path_note)
 
     while True:
         user_input = input(">>>")

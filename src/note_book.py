@@ -195,33 +195,19 @@ class NoteBook(UserDict):
                 result.append(note.key)
         return result
 
-    def save_to_file(self, filename: str):
-        with open(filename, 'w') as f:
+    def save_to_file(self, path):
+        with open(path, 'wb') as f_out:
+            pickle.dump([self.data, self.tags, self.max], f_out)
+            #print(f"Saved notes:{len(self.data)} tags:{len(self.tags)}")
+        return ""
 
-            json.dump({
-                str(note.key): (
-                    str(note.value if note.value else ""),
-                    "".join([tag for tag in note.tags])) for key, note in self.items()}, 
-                f, indent=4)
-
-        return f"The note_book is saved."
-
-    def load_file(self, filename):
-        try:
-            with open(filename, 'r') as f:
-                data_dict = json.load(f)
-                for key, value in data_dict.items():                    
-                    note, tag = value
-                    note = Note(note)
-                    tag = Tag(tag)
-                    self.data[tag.key] = tag
-
-            if isinstance(self.data, dict):
-                print(f"The Notebook is loaded.")
-                if not len(self.data): 
-                    return f"Notebook is empty"
-            else:
-                print("The file does not contain a valid Notebook.")
-        except FileNotFoundError:
-            print(f"The file {filename} does not exist")
-
+    def load_file(self, path):
+        if path.exists():
+            with open(path, 'rb') as f_in:
+                obj = pickle.load(f_in)
+                if len(obj) != 3: raise ValueError("Wrong object loaded")
+                self.data = obj[0]
+                self.tags = obj[1]
+                self.max  = obj[2]
+            #print(f"Load notes:{len(self.data)} tags:{len(self.tags)}, max={str(self.max)}")
+        return ""
