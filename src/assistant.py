@@ -51,7 +51,6 @@ def input_error(func):
         return result
     return wrapper
 
-
 #=========================================================
 # >> note-add <текст нотатки будь-якої довжини>
 # example >> note-add My first note in this bot.
@@ -140,20 +139,19 @@ def tag_show(args):
     return ""
 
 #=========================================================
-# TODO: smart sorting
-# >> note-sort
-# Сортування нотаток по тегу
+# >> n-search <text>
+# пошук та сортування нотаток за ключовими словами
 #=========================================================
 @input_error
-def note_sort(args):    
-    result = []
-    for note in note_book.values():
-        line = f"{note.value}"
-        result.append(line)
-    result.sort()
+def notes_search(args):
+    search_text = args.strip()
+    result = note_book.search_notes_by_text_tags(search_text)
+
+    if len(result) > 0: print("="*40)
     count = 0
     for item in result:
         print(item)
+        print("="*40)
         count += 1
         if count == 5:
             input("\nFor next page press enter\n")
@@ -504,7 +502,7 @@ COMMANDS_NOTES = {
     note_change: ("note_change", "note-change",),
     note_find: ("note_find", "note-find",),
     note_show: ("note_show", "note-show", "noteshow",),
-    #note_sort: ("note_sort", "note-sort",),    #? 
+    notes_search: ("n-search",),
     add_tags: ("tags+", "add_tags", "add-tags",),
     del_tags: ("tags-", "del_tags", "del-tags",),
     tag_show: ("tag-show", "tag_show",),

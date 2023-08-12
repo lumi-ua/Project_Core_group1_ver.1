@@ -43,7 +43,7 @@ class Note(Field):
 
     def __str__(self):
         result = f"{str(self.value)}\nkey: {str(self.key)}"
-        if len(self.tags): result += "".join(["\n#" + tag for tag in self.tags])
+        if len(self.tags): result += "\n" + " ".join(["#" + tag for tag in self.tags])
         return result
 
     # добавляем ключ-ссылку на тэг в список ключей, тем самым делаем привязку к тэгу
@@ -134,7 +134,7 @@ class NoteBook(UserDict):
             return f"Deleted Note.key: {note.key}\nNote: {note.value}\nTags: {len(note.tags)}"
         return f"Wrong key={note_key} to delete Note"
 
-    # получаем список у тэга список ноутов в развёрнутом текстовом формате
+    # получаем у тэга список ноутов в развёрнутом текстовом формате
     def get_tag_notes(self, tag_key: str) -> list:
         if tag_key in self.tags.keys():
             tag = self.tags[tag_key]
@@ -144,6 +144,33 @@ class NoteBook(UserDict):
                 notes_list.append(f"Note[{note.key}]:{note.value}")
             return notes_list
         return []
+
+    # ищем текст в тэгах, и возвращаем список ноутов по найденным тэгам
+    def search_notes_by_text_tags(self, text: str):
+        tag_list = []
+
+        # находим все тэги, содержащие в себе искомый текст
+        if len(text) > 0:
+            for tag in self.tags.values():
+                if tag.value.find(text) >= 0:
+                    tag_list.append(tag.value)
+        # сортируем найденные тэги по их тексту
+        tag_list = sorted(tag_list)
+
+        # формируем по найденным тэгам список ключей привязанных к ним ноутов
+        # исспользуем set(), чтобы исключить дубли ключей, 
+        # потомучто к разным найденным тэгам может быть привязан один и тот-же ноут
+        note_ids = set()
+        for tag_str in tag_list:
+            # получаем тэг по ключу
+            tag = self.tags[tag_str]
+            note_ids.update(tag.notes)
+
+        # формируем финальный список ноутов из словаря с индексами
+        note_list = [self.data[id] for id in note_ids]
+
+        print(f"search_notes_by_text:\"{text}\" in tags={len(tag_list)}, for notes={len(note_list)}")
+        return note_list
         
     def iterator(self, group_size=15):
         notes = list(self.data.values())
