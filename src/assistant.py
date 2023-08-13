@@ -110,7 +110,7 @@ def note_change(args):
 # >> note-find <text-fragment>
 #=========================================================
 @input_error
-def note_find(args):
+def notes_find(args):
     key_list = note_book.find_notes(args.strip())
     if key_list:
         return f"Search result in notes: {str(key_list)}"
@@ -145,7 +145,7 @@ def tag_show(args):
 # пошук та сортування нотаток за ключовими словами
 #=========================================================
 @input_error
-def notes_search(args):
+def notes_tag_search(args):
     search_text = args.strip()
     result = note_book.search_notes_by_text_tags(search_text)
 
@@ -177,12 +177,10 @@ def func_new_user(*args):
     count_prm = len(args)
     if (count_prm >= 2):
         if not args[0].capitalize() in book.keys():
-
             name = args[0]
             new_name = Name(args[0].capitalize())
            
             new_birthday = Birthday(args[1])
-
             if new_birthday.value == None:
                 args = args[1:]
             else:
@@ -385,7 +383,6 @@ def func_del_address(*args):
 # функція виконує пошук інформації у довідковій книзі
 #              example >> search Mike
 #                      >> search 38073
-#                      >> search none
 #=========================================================
 @input_error
 def func_search(*args):
@@ -502,9 +499,9 @@ COMMANDS_NOTES = {
     note_add: ("note+", "note_add", "note-add", ),
     note_del: ("note_del", "note-del",),
     note_change: ("note_change", "note-change",),
-    note_find: ("note_find", "note-find",),
+    notes_find: ("note_find", "note-find",),
     note_show: ("note_show", "note-show", "noteshow",),
-    notes_search: ("n-search",),
+    notes_tag_search: ("n-search",),
     add_tags: ("tags+", "add_tags", "add-tags",),
     del_tags: ("tags-", "del_tags", "del-tags",),
     tag_show: ("tag-show", "tag_show",),
