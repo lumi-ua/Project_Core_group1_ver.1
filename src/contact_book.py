@@ -48,7 +48,6 @@ class Name(Field):
     def value(self, value):
         self.__value = value
 
-  
 
 # клас Телефон
 class Phone(Field): 
