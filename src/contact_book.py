@@ -58,11 +58,10 @@ class Phone(Field):
     
     @value.setter
     def value(self, value):
-        if value.lower() == "none": 
-            self.__value = "None"
-            return ""   # не видаляти
-        
-        if value:
+        if value == None: 
+            self.__value = value
+            raise PhoneException("Incorrect phone format: None")
+        else:
             correct_phone = ""
             for i in value: 
                 if i in "+0123456789": correct_phone += i
@@ -71,7 +70,7 @@ class Phone(Field):
             elif len(correct_phone) == 12: self.__value = "+" + correct_phone # "380123456789"
             elif len(correct_phone) == 10: self.__value = "+38" + correct_phone # "0123456789"
             elif len(correct_phone) == 9: self.__value = "+380" + correct_phone # "123456789"
-            else: raise PhoneException("Incorrect phone format")   # невірний формат телефона            
+            else: raise PhoneException("Incorrect phone format")
 
     
 # клас День народження        
@@ -152,7 +151,7 @@ class Record():
     def edit_birthday(self, birthday: Birthday):
         if birthday.value:
             self.birthday = birthday
-            return "bithday changed to: {birthday.value}"
+            return f"bithday changed to: {birthday.value}"
         # если None то интерпретируем как удаление всего поля
         self.birthday = None
         return "birthday successfully deleted"
@@ -160,7 +159,7 @@ class Record():
     def edit_email(self, email: Email):
         if email.value:
             self.email = email
-            return "email changed to: {email.value}"
+            return f"email changed to: {email.value}"
         # если None то интерпретируем как удаление всего поля
         self.email = None
         return "email successfully deleted"
@@ -168,7 +167,7 @@ class Record():
     def edit_address(self, address: Address):
         if address.value:
             self.address = address
-            return "address changed to: {address.value}"
+            return f"address changed to: {address.value}"
         # если None то интерпретируем как удаление всего поля
         self.address = None
         return "address successfully deleted"
