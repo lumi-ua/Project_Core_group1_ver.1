@@ -1,6 +1,6 @@
 from collections import UserDict
 from datetime import datetime
-import json
+import pickle
 from contact_book import Field
 
 class Tag(Field):
@@ -43,7 +43,7 @@ class Note(Field):
 
     def __str__(self):
         result = f"{str(self.value)}\nkey: {str(self.key)}"
-        if len(self.tags): result += "".join(["\n#" + tag for tag in self.tags])
+        if len(self.tags): result += "\n" + " ".join(["#" + tag for tag in self.tags])
         return result
 
     # добавляем ключ-ссылку на тэг в список ключей, тем самым делаем привязку к тэгу
@@ -109,7 +109,7 @@ class NoteBook(UserDict):
                     tag = self.tags.pop(tag_key)
 
             return f"del_tags: successfully detached tags:{len(tags_list)}"
-        else: return f"add_tags: wrong note.key={note_key}"
+        else: return f"del_tags: wrong note.key={note_key}"
 
 
     def create_note(self, value: str):
@@ -134,7 +134,7 @@ class NoteBook(UserDict):
             return f"Deleted Note.key: {note.key}\nNote: {note.value}\nTags: {len(note.tags)}"
         return f"Wrong key={note_key} to delete Note"
 
-    # получаем список у тэга список ноутов в развёрнутом текстовом формате
+    # получаем у тэга список ноутов в развёрнутом текстовом формате
     def get_tag_notes(self, tag_key: str) -> list:
         if tag_key in self.tags.keys():
             tag = self.tags[tag_key]
@@ -144,6 +144,38 @@ class NoteBook(UserDict):
                 notes_list.append(f"Note[{note.key}]:{note.value}")
             return notes_list
         return []
+
+    # ищем текст в тэгах, и возвращаем список ноутов по найденным тэгам
+    def search_notes_by_text_tags(self, text: str):
+        tag_list = []
+
+        # находим все тэги, содержащие в себе искомый текст
+        if len(text) > 0:
+            for tag in self.tags.values():
+                if tag.value.find(text) >= 0:
+                    tag_list.append(tag.value)
+        # сортируем найденные тэги по их тексту
+        tag_list = sorted(tag_list)
+        note_list = []
+
+        # формируем по найденным тэгам список ключей, привязанных к этим ноутам
+        # исспользуем множество set(int), чтобы исключить дубли ключей, 
+        # потому как к разным найденным тэгам может быть привязан один и тот-же ноут
+        note_ids = set()
+
+        # проходим по списку в том порядке, в котором они были отсортированы
+        for tag_str in tag_list:
+            # получаем тэг по ключу
+            tag = self.tags[tag_str]
+            for id in tag.notes:
+                if id not in note_ids:
+                    # заполняем финальный список ноутов
+                    note_list.append(self.data[id])
+            # заполняем ноутами чтобы устранять дубликаты
+            note_ids.update(tag.notes)
+
+        print(f"search_notes_by_text:\"{text}\" in tags={len(tag_list)}, for notes={len(note_list)}")
+        return note_list
         
     def iterator(self, group_size=15):
         notes = list(self.data.values())
@@ -162,48 +194,19 @@ class NoteBook(UserDict):
                 result.append(note.key)
         return result
 
-    def save_data(self, filename: str):
-        with open(filename, 'w') as f:
+    def save_to_file(self, path):
+        with open(path, 'wb') as f_out:
+            pickle.dump([self.data, self.tags, self.max], f_out)
+            #print(f"Saved notes:{len(self.data)} tags:{len(self.tags)}")
+        return ""
 
-            json.dump({
-                str(note.key): (
-                    str(note.value if note.value else ""),
-                    "".join([tag for tag in note.tags])) for key, note in self.items()}, 
-                f, indent=4)
-
-        return f"The note_book is saved."
-
-    def load_data(self, filename):
-        try:
-            with open(filename, 'r') as f:
-                data_dict = json.load(f)
-                for key, value in data_dict.items():                    
-                    note, tag = value
-                    note = Note(note)
-                    tag = Tag(tag)
-                    self.data[tag.key] = tag
-
-            if isinstance(self.data, dict):
-                print(f"The Notebook is loaded.")
-                if not len(self.data): 
-                    return f"Notebook is empty"
-            else:
-                print("The file does not contain a valid Notebook.")
-        except FileNotFoundError:
-            print(f"The file {filename} does not exist")
-
-    
-#if __name__ == "__main__":
-    #nb = NoteBook()
-    #file_name = "n_book.json"
-    #print(nb.load_data(file_name))
-    #print(nb) 
-
-    #key=datetime.now().replace(microsecond=0).timestamp()
-    #note = Note('Create tag sorting')
-    #rec = NoteRecord(key, note, Tag('Project'))
-    #nb.add_record(rec)
-
-    #print(nb.find_note('note'))
-    #print(nb.save_data(file_name))
-    #print(nb)
+    def load_file(self, path):
+        if path.exists():
+            with open(path, 'rb') as f_in:
+                obj = pickle.load(f_in)
+                if len(obj) != 3: raise ValueError("Wrong object loaded")
+                self.data = obj[0]
+                self.tags = obj[1]
+                self.max  = obj[2]
+            #print(f"Load notes:{len(self.data)} tags:{len(self.tags)}, max={str(self.max)}")
+        return ""
