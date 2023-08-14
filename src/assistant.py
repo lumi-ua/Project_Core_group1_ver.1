@@ -87,7 +87,7 @@ def note_del(args):
     params = args.strip().split()
     if len(params) == 1:
         return note_book.del_note(params[0])
-    else: return "Wrong arguments amount. Expected 1 argument"
+    else: raise ArgsAmountException("Wrong arguments amount. Expected 1 argument")
 
 #=========================================================
 # >> note-change <key> <Text>
@@ -160,7 +160,7 @@ def notes_tag_search(args):
     return ""
 
 @input_error
-def notebook_show(args):
+def show_note_book(args):
     for note in note_book.data.values():
         print(f"[{(len(note.tags))}] {note.key}: " + note.value)
     for tag in note_book.tags.values():
@@ -182,6 +182,7 @@ def func_new_user(*args):
             new_birthday = Birthday(args[1])
             if new_birthday.value == None:
                 args = args[1:]
+                new_birthday = None
             else:
                 args = args[2:]
      
@@ -197,7 +198,7 @@ def func_new_user(*args):
      
 
 @input_error
-def func_show_all(*args)->str:
+def show_contact_book(*args)->str:
     if len(book.data) == 0: 
         return "The database is empty"
     else: 
@@ -416,7 +417,7 @@ def func_sort_files(*args):
         return f"[bold yellow]Enter path[/bold yellow]"
 
 
-def func_help(*args):
+def show_help(*args):
     return """[bold red]cls[/bold red] - очищення екрану від інформації
 [bold red]hello[/bold red] - вітання
 [bold red]good bye, close, exit[/bold red] - завершення програми
@@ -477,7 +478,7 @@ COMMANDS = {
     func_rename_user: ("rename",),
     func_del_user: ("user-", "del-user", "delete-user", ),
     func_phone: ("phone",),
-    func_show_all: ("show-all", "show_all", "showall"),
+    show_contact_book: ("show-all", "show_all", "showall"),
     func_add_phone: ("add-phone", "add_phone",),
     func_del_phone: ("del-phone", "del_phone"),
     func_del_birthday: ("del-birthday", "del_birthday"),
@@ -489,7 +490,7 @@ COMMANDS = {
     func_change_email: ("edit-email", "edit_email"),
     func_change_address: ("edit-address", "edit_address"),
     func_list_birthday: ("birthday",),
-    func_help: ("help", "?",),
+    show_help: ("help", "?",),
     func_search: ("search", "find", "seek"),
     func_sort_files: ("sort",),
 }
@@ -504,7 +505,7 @@ COMMANDS_NOTES = {
     add_tags: ("tags+", "add_tags", "add-tags",),
     del_tags: ("tags-", "del_tags", "del-tags",),
     tag_show: ("tag-show", "tag_show",),
-    notebook_show: ("notebook",),
+    show_note_book: ("notebook",),
 }
 
 ################################################################
