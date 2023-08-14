@@ -87,7 +87,7 @@ def note_del(args):
     params = args.strip().split()
     if len(params) == 1:
         return note_book.del_note(params[0])
-    else: return "Wrong arguments amount. Expected 1 argument"
+    else: raise ArgsAmountException("Wrong arguments amount. Expected 1 argument")
 
 #=========================================================
 # >> note-change <key> <Text>
