@@ -26,12 +26,14 @@ class AbstractView(ABC):
 
 class Console_View(AbstractView):
 
+   # вывод в консоль ноут-буки
    def show_note_book(self, note_book: NoteBook):
       for note in note_book.data.values():
          print(f"[{(len(note.tags))}] {note.key}: " + note.value)
       for tag in note_book.tags.values():
          print("[" + str(tag.sz()) + "]#" + tag.value)
 
+   # вывод в консоль контакт-буки
    def show_contact_book(self, contact_book: AddressBook):
       if len(contact_book.data) == 0: 
          print("The database is empty")
@@ -53,6 +55,7 @@ class Console_View(AbstractView):
                   ) for record in contact_book.data.values()]        
          console.print(table)
 
+   # вывод в консоль хэлпа
    def show_help(self):
          print("""[bold red]cls[/bold red] - очищення екрану від інформації
 [bold red]hello[/bold red] - вітання
@@ -97,7 +100,7 @@ class Console_View(AbstractView):
 """)
 
 #---------------------------------------------
-#пораждает семейство отображений для Web
+#реализует вывод всех сущностей для Web
 class Web_View(AbstractView):
    pass
 
