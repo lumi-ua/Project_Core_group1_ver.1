@@ -182,6 +182,7 @@ def func_new_user(*args):
             new_birthday = Birthday(args[1])
             if new_birthday.value == None:
                 args = args[1:]
+                new_birthday = None
             else:
                 args = args[2:]
      
