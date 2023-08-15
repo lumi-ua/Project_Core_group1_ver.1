@@ -209,7 +209,7 @@ def func_book_pages(*args):
         n_page += 1
         print(f"{'='*14} Page # [bold red]{n_page}[/bold red] {'='*16}")
         for record in batch:
-            print("\n".join([f"{record.name.value}|{record.birthday.value}|{', '.join(map(lambda phone: phone.value, record.phones))}"]))
+            print(str(record))
         print("="*40)    
         print("Press [bold red]Enter [/bold red]", end="")
         input("to continue next page...")
