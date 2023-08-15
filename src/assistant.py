@@ -188,7 +188,7 @@ def func_new_user(*args):
             
             return "1 record was successfully added - [bold green]success[/bold green]"
         else: return "The person is already in database"
-    else: return "Wrong arguments amount. Expected 3 arguments"
+    else: raise ArgsAmountException("Wrong arguments amount. Expected 3 arguments")
      
 
 @input_error
@@ -213,7 +213,7 @@ def func_book_pages(*args):
         print("="*40)    
         print("Press [bold red]Enter [/bold red]", end="")
         input("to continue next page...")
-    return f"End of the book" 
+    return f"End of the ContactBook" 
 
 
 #=========================================================
