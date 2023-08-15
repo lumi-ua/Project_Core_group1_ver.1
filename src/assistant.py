@@ -5,18 +5,13 @@ import platform  # для clearscrean()
 from contact_book import AddressBook, Record, Name, Phone, Email, Birthday, Address, PhoneException, BirthdayException, EmailException
 from clean import sort_main
 from note_book import NoteBook
-from view import Console_View
-import re
+from console_view import Console_View
 import readline
-
-from rich import print
-from rich import box
-from rich.table import Table
-from rich.console import Console
 
 path_book = Path(sys.path[0]).joinpath("user_book.bin")
 path_note = Path(sys.path[0]).joinpath("note_book.bin")
 
+view = Console_View()
 book = AddressBook()
 note_book = NoteBook()
 
@@ -148,11 +143,11 @@ def tag_show(args):
 @input_error
 def notes_tag_search(args):
     search_text = args.strip()
-    result = note_book.search_notes_by_text_tags(search_text)
+    notes_list = note_book.search_notes_by_text_tags(search_text)
 
-    if len(result) > 0: print("="*40)
+    if len(notes_list) > 0: print("="*40)
     count = 0
-    for item in result:
+    for item in notes_list:
         print(item)
         print("="*40)
         count += 1
@@ -163,7 +158,6 @@ def notes_tag_search(args):
 
 @input_error
 def show_note_book(args):
-    view = Console_View()
     view.show_note_book(note_book=note_book)
     return ""
 
@@ -199,13 +193,12 @@ def func_new_user(*args):
 
 @input_error
 def show_contact_book(*args)->str:
-    view = Console_View()
     view.show_contact_book(contact_book=book)
     return ""
 
 #=========================================================
 # >> show-book /N
-# Команда "show-book" друкує книгу контактів по N записів
+# друкує книгу контактів по N записів
 # де N - це кількість записів на одній сторінці
 #=========================================================
 @input_error
@@ -253,8 +246,7 @@ def no_command(*args):
     return func_hello(args=args)
 
 #=========================================================
-# Выводит в консоль номера телефонов для указанного контакта.
-# >> phone Ben
+# >> phone <username>
 #=========================================================
 @input_error
 def show_user(*args):
@@ -265,8 +257,7 @@ def show_user(*args):
     else: raise ArgsAmountException('Wrong arguments amount. Missed "Name" of the person')
 
 
-#=========================================================
-# функція розширює новіми телефонами існуючий запис особи Mike   
+#========================================================= 
 # >> add-phone Mike +380509998877 +380732225566
 #=========================================================
 @input_error
@@ -278,9 +269,8 @@ def func_add_phone(*args):
     else: raise ArgsAmountException("Wrong arguments amount. Expected 2 arguments")
 
 
-#=========================================================
-# функція змінює день народження для особи    
-# Example >> change-birthday Mike 12.05.1990
+#=========================================================  
+# >> change-birthday Mike 12.05.1990
 #=========================================================
 @input_error
 def func_change_birthday(*args):
@@ -400,9 +390,8 @@ def func_sort_files(*args):
     else:
         return f"[bold yellow]Enter path[/bold yellow]"
 
-
+@input_error
 def show_help(*args):
-    view = Console_View()
     view.show_help()
     return ""
 
@@ -492,7 +481,6 @@ def parser(text: str):
     return no_command, None
 ################################################################
 def main():
-    print("[white]Run >> [/white][bold red]help[/bold red] - list of the commands")
     global path_book
     global path_note
     book.load_database(path_book)
