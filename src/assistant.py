@@ -186,7 +186,7 @@ def func_new_user(*args):
                 book.add_record(rec)
             else: raise PhoneException("Phone absent in arguments")
             
-            return "1 record was successfully added - [bold green]success[/bold green]"
+            return "1 record was successfully added"
         else: return "The person is already in database"
     else: raise ArgsAmountException("Wrong arguments amount. Expected 3 arguments")
      
@@ -207,11 +207,11 @@ def func_book_pages(*args):
     n_page = 0
     for batch in book._record_generator(N=n):
         n_page += 1
-        print(f"{'='*14} Page # [bold red]{n_page}[/bold red] {'='*16}")
+        print(f"{'='*14} Page #{n_page} {'='*16}")
         for record in batch:
             print(str(record))
         print("="*40)    
-        print("Press [bold red]Enter [/bold red]", end="")
+        print("Press Enter", end="")
         input("to continue next page...")
     return f"End of the ContactBook" 
 
@@ -363,7 +363,7 @@ def func_search(*args):
         lst_result = book.search(args[0].strip())
         s = "\n".join([str(rec) for rec in lst_result])
         if lst_result:
-            print(f"[bold green]Search results:[/bold green]")
+            print(f"Search results:")
             print(s)
             return ""
         else: return f"No matches found for {args[0]}"
@@ -384,7 +384,7 @@ def func_sort_files(*args):
     elif len(args) == 0:
         return sort_main("")
     else:
-        return f"[bold yellow]Enter path[/bold yellow]"
+        return f"Enter path"
 
 @input_error
 def show_help(*args):
