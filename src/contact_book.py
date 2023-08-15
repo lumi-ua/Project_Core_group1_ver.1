@@ -174,14 +174,14 @@ class Record():
     def __str__(self) -> str:
         result = f"{', '.join(map(lambda phone: phone.value, self.phones))}"
         if self.birthday != None:
-            result = f"{self.birthday.value}|" + result
+            result = f"{self.birthday.value} | " + result
         if self.email != None:
-            result = f"{self.email.value}|" + result
+            result = f"{self.email.value} | " + result
         if self.address != None:
-            result = f"{self.address.value}|" + result
+            result = f"{self.address.value} | " + result
 
-        return f"{self.name.value}|" + result
-      
+        return f"{self.name.value} | " + result
+
 
     # Done - розширюємо існуючий список телефонів особи - Done
     # НОВИМ телефоном або декількома телефонами для особи - Done
