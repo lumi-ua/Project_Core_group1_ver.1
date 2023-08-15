@@ -353,27 +353,23 @@ def func_del_address(*args):
     else: raise ArgsAmountException("Wrong arguments amount. Expected 1 arguments")
 
 #=========================================================
-# TODO: tuning
 # функція виконує пошук інформації у довідковій книзі
 #              example >> search Mike
 #                      >> search 38073
 #=========================================================
 @input_error
 def func_search(*args):
-    lst_result = []
-    rec_str = ""
     if (len(args) == 1):
-        for rec in book.values():
-            rec_str = str(rec)
-            if args[0].lower() in rec_str.lower():
-                lst_result.append(rec_str)
-                
-        s = "\n".join([rec for rec in lst_result])
-        if lst_result: return f"[bold green]Search results:[/bold green]\n{s}"
+        lst_result = book.search(args[0].strip())
+        s = "\n".join([str(rec) for rec in lst_result])
+        if lst_result:
+            print(f"[bold green]Search results:[/bold green]")
+            print(s)
+            return ""
         else: return f"No matches found for {args[0]}"
     else: raise ArgsAmountException("Wrong arguments amount. Expected 1 arguments")
     
-    
+
 # =========================================================
 # сортування файлів у вказаній папці
 #              example >> sort Testfolder

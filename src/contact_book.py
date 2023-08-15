@@ -173,7 +173,7 @@ class Record():
 
     def __str__(self) -> str:
         result = f"{', '.join(map(lambda phone: phone.value, self.phones))}"
-        if self.birthday.value != None:
+        if self.birthday != None:
             result = f"{self.birthday.value}|" + result
         if self.email != None and self.email.value != None:
             result = f"{self.email.value}|" + result
@@ -214,6 +214,19 @@ class Record():
         return True if result else False
     
 class AddressBook(UserDict):
+
+    def search(self, text):
+        result = []
+        for rec in self.values():
+            if (rec.name.value.lower().find(text.lower()) >= 0):
+                result.append(rec)
+                continue
+            for phone in rec.phones:
+                if phone.value.find(text.lower()) >= 0:
+                    result.append(rec)
+                    break
+
+        return result
 
     def get_list_birthday(self, count_day: int):
         lst = []
