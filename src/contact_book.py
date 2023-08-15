@@ -175,9 +175,9 @@ class Record():
         result = f"{', '.join(map(lambda phone: phone.value, self.phones))}"
         if self.birthday != None:
             result = f"{self.birthday.value}|" + result
-        if self.email != None and self.email.value != None:
+        if self.email != None:
             result = f"{self.email.value}|" + result
-        if self.address != None and self.address.value != None:
+        if self.address != None:
             result = f"{self.address.value}|" + result
 
         return f"{self.name.value}|" + result
@@ -187,7 +187,7 @@ class Record():
     # НОВИМ телефоном або декількома телефонами для особи - Done
     def add_phone(self, list_phones) -> str:
         self.phones.extend(list_phones)
-        return f"The phones was/were added - [bold green]success[/bold green]"
+        return f"The phones was/were added successfully"
     
     # Done - видаляємо телефони із списку телефонів особи - Done!
     def del_phone(self, del_phone: Phone) -> str:
@@ -198,14 +198,14 @@ class Record():
                     self.phones.append(Phone("None")) if self.phones == [] else self.phones 
                     error = False  #видалення пройшло з успіхом
                     break
-        if error: return f"The error has occurred. You entered an incorrect phone number."
-        else: return f"The phone {phone.value} was deleted - [bold green]success[/bold green]"
+        if error: return f"Entered incorrect phone number."
+        else: return f"The phone {phone.value} was deleted successfully"
     
     # Done = редагування запису(телефону) у книзі особи - Done
     def edit_phone(self, old_phone: Phone, new_phone: Phone) -> str:
         index = next((i for i, obj in enumerate(self.phones) if obj.value == old_phone.value), -1)
         self.phones[index]= new_phone
-        return f"User set new phone-number - [bold green]success[/bold green]"
+        return f"User set new phone-number successfully"
     
     
     # перевіряє наявність 1(одного)телефону у списку
@@ -241,7 +241,7 @@ class AddressBook(UserDict):
        
     def add_record(self, record):
         self.data[record.name.value] = record
-        return "1 record was successfully added - [bold green]success[/bold green]"
+        return "1 record was added successfully"
 
     def rename_record(self, old_name: str, new_name: str):
         rec = self.data.pop(old_name)
@@ -253,8 +253,8 @@ class AddressBook(UserDict):
     def load_database(self, path):
         if path.exists():
             with open(path, "rb") as fr_bin:
-                self.data = pickle.load(fr_bin)  # копирование Словника   load_data = pickle.load(fr_bin)
-                                                                    # self.data = {**load_data}
+                self.data = pickle.load(fr_bin) # копирование Словника   load_data = pickle.load(fr_bin)
+                                                # self.data = {**load_data}
             return f"The database has been loaded = {len(self.data)} records"
         return ""
     
