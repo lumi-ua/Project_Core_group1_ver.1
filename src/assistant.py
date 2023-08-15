@@ -1,6 +1,7 @@
 
 from pathlib import Path
 import os, sys
+import re
 import platform  # для clearscrean()
 from contact_book import AddressBook, Record, Name, Phone, Email, Birthday, Address, PhoneException, BirthdayException, EmailException
 from clean import sort_main
@@ -18,13 +19,12 @@ note_book = NoteBook()
 class ArgsAmountException(Exception):
    """Wrong arguments amount exception"""
         
-# Декоратор для Обробки командної строки
+
 def input_error(func):
     def wrapper(*args):
         result = None
         try:
             result = func(*args)
-        # Обробка виключних ситуацій
         except BirthdayException as e:
             print(e)
         except PhoneException as e:
@@ -33,7 +33,7 @@ def input_error(func):
             print(e)
         except ArgsAmountException as e:
             print(e)
-        except FileNotFoundError:    # Файл бази даних Відсутній
+        except FileNotFoundError:
             print("The database isn't found")
         except ValueError:
             print("Incorect data or unsupported format for file")
