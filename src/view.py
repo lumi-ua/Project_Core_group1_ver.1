@@ -17,9 +17,3 @@ class AbstractView(ABC):
    def show_help(self):
       pass
 
-
-#---------------------------------------------
-#реализует вывод всех сущностей для Web
-class Web_View(AbstractView):
-   pass
-
