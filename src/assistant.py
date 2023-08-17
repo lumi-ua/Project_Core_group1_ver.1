@@ -106,9 +106,9 @@ def note_change(args):
 #=========================================================
 @input_error
 def notes_find(args):
-    key_list = note_book.find_notes(args.strip())
-    if key_list:
-        return f"Search result in notes: {str(key_list)}"
+    notes_list = note_book.find_notes(args.strip())
+    if notes_list:
+        return f"Search result in notes: \n{str(notes_list)}"
     else:
         return f"No one notes was found for fragment: '{args}'"
 
@@ -300,9 +300,10 @@ def func_change_address(*args):
 @input_error
 def func_list_birthday(*args):
     count_day = 0
-    if (len(args) == 1):
-        count_day = int(args[0])
-    return book.get_list_birthday(count_day)
+    if (len(args) == 1): count_day = int(args[0])
+    user_list = book.get_list_birthday(count_day)
+    print(user_list)
+    return ""
 
 #=========================================================
 # видаляє телефон або список телефонів в існуючому записі особи Mike   
