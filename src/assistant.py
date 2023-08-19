@@ -106,9 +106,9 @@ def note_change(args):
 #=========================================================
 @input_error
 def notes_find(args):
-    key_list = note_book.find_notes(args.strip())
-    if key_list:
-        return f"Search result in notes: {str(key_list)}"
+    notes_list = note_book.find_notes(args.strip())
+    if notes_list:
+        return f"Search result in notes: \n{str(notes_list)}"
     else:
         return f"No one notes was found for fragment: '{args}'"
 
@@ -186,7 +186,7 @@ def func_new_user(*args):
                 book.add_record(rec)
             else: raise PhoneException("Phone absent in arguments")
             
-            return "1 record was successfully added - [bold green]success[/bold green]"
+            return "1 record was successfully added"
         else: return "The person is already in database"
     else: raise ArgsAmountException("Wrong arguments amount. Expected 3 arguments")
      
@@ -207,11 +207,11 @@ def func_book_pages(*args):
     n_page = 0
     for batch in book._record_generator(N=n):
         n_page += 1
-        print(f"{'='*14} Page # [bold red]{n_page}[/bold red] {'='*16}")
+        print(f"{'='*14} Page #{n_page} {'='*16}")
         for record in batch:
             print(str(record))
         print("="*40)    
-        print("Press [bold red]Enter [/bold red]", end="")
+        print("Press Enter", end="")
         input("to continue next page...")
     return f"End of the ContactBook" 
 
@@ -300,9 +300,10 @@ def func_change_address(*args):
 @input_error
 def func_list_birthday(*args):
     count_day = 0
-    if (len(args) == 1):
-        count_day = int(args[0])
-    return book.get_list_birthday(count_day)
+    if (len(args) == 1): count_day = int(args[0])
+    user_list = book.get_list_birthday(count_day)
+    print(user_list)
+    return ""
 
 #=========================================================
 # видаляє телефон або список телефонів в існуючому записі особи Mike   
@@ -363,7 +364,7 @@ def func_search(*args):
         lst_result = book.search(args[0].strip())
         s = "\n".join([str(rec) for rec in lst_result])
         if lst_result:
-            print(f"[bold green]Search results:[/bold green]")
+            print(f"Search results:")
             print(s)
             return ""
         else: return f"No matches found for {args[0]}"
@@ -384,7 +385,7 @@ def func_sort_files(*args):
     elif len(args) == 0:
         return sort_main("")
     else:
-        return f"[bold yellow]Enter path[/bold yellow]"
+        return f"Enter path"
 
 @input_error
 def show_help(*args):
@@ -408,8 +409,8 @@ COMMANDS = {
     func_new_user: ("user+", "add+", "add-user", "new", ),
     func_rename_user: ("rename",),
     func_del_user: ("user-", "del-user", "delete-user", ),
-    func_add_phone: ("add-phone", "add_phone",),
-    func_del_phone: ("del-phone", "del_phone"),
+    func_add_phone: ("phone+", "add-phone", "add_phone",),
+    func_del_phone: ("phone-", "del-phone", "del_phone"),
     func_del_birthday: ("del-birthday", "del_birthday"),
     func_del_email: ("del-email", "del_email"),
     func_del_address: ("del-address", "del_address"),

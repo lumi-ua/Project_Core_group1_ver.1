@@ -131,7 +131,7 @@ class NoteBook(UserDict):
                 # если тэг после отвязки не привязан не к одному ноуту - удаляем тэг
                 if tag.sz() == 0:
                     self.tags.pop(tag_key)
-            return f"Deleted Note.key: {note.key}\nNote: {note.value}\nTags: {len(note.tags)}"
+            return f"Deleted Note.key: {note.key}"
         return f"Wrong key={note_key} to delete Note"
 
     # получаем у тэга список ноутов в развёрнутом текстовом формате

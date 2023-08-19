@@ -1,2 +1,2 @@
-# Project_Core_group1_ver.1
-CLI - Command Line Interface bot
+## ProjectCore-group1-v2
+CLI - Command Line Interface assistant
