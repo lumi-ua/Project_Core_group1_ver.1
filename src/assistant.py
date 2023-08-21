@@ -428,15 +428,15 @@ COMMANDS = {
 }
 
 COMMANDS_NOTES = {
-    note_add: ("note+", "note_add", "note-add", ),
-    note_del: ("note_del", "note-del",),
-    note_change: ("note_change", "note-change",),
-    notes_find: ("note_find", "note-find",),
-    notes_tag_search: ("n-search",),
-    add_tags: ("tags+", "add_tags", "add-tags",),
-    del_tags: ("tags-", "del_tags", "del-tags",),
-    tag_show: ("tag-show", "tag_show",),
-    show_note: ("shownote", "show-note",),
+    note_add:   ("note+",   "add-note",),
+    note_del:   ("note-",   "del-note",),
+    note_change:("note*",   "change-note",),
+    notes_find: ("note?",   "find-note",),
+    notes_tag_search: ("note#",),
+    add_tags:   ("tags+",   "add_tags", "add-tags",),
+    del_tags:   ("tags-",   "del_tags", "del-tags",),
+    tag_show:   ("showtag", "show-tag",),
+    show_note:  ("shownote", "show-note",),
     show_note_book: ("notebook",),
 }
 
