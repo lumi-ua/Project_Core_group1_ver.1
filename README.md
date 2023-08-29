@@ -41,7 +41,7 @@ To avoid Python error **"EOFError: EOF when reading a line"** occurs when you us
 sudo docker run -ti pycore-g1-v2
 ```
 
-### Save docker-image to file:
+### Save docker-image to file by ID:
 ```
 sudo docker save cf36593ab3a8 --output pycore-g1-v2.tar
 ```
