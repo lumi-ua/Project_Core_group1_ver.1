@@ -1,8 +1,8 @@
 ## ProjectCore-group1-v2
 CLI - Command Line Interface assistant
 
-### Create virtual environment using pipenv (Pipfile, Pipefile.lock will be create automatically):
-Create environment for custom version of python:
+### Creating virtual environment:
+Create virtual environment using pipenv (Pipfile, Pipefile.lock will be create automatically):
 ```
 pipenv --python 3.8.10
 ```
