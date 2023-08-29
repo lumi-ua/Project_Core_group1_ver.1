@@ -43,3 +43,19 @@ sudo docker run -ti pycore-g1-v2
 ```
 sudo docker save cf36593ab3a8 --output pycore-g1-v2.tar
 ```
+
+### Load image from tar-archive
+Using import:
+```
+docker image import file.tar images_name:image_tag
+```
+
+Linux version:
+```
+docker load < filename.tar
+```
+
+Windows version:
+```
+docker load -i filename.tar
+```
