@@ -30,5 +30,5 @@ pipenv requirements > requirements.txt
 
 ### Build docker-file:
 ```
-docker build . -t diixo/pycore-g1-v2
+sudo docker build . -t pycore-g1-v2
 ```
