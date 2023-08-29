@@ -39,12 +39,12 @@ To avoid Python error **"EOFError: EOF when reading a line"** occurs when you us
 sudo docker run -ti pycore-g1-v2
 ```
 
-### Save docker-image to file
+### Save docker-image to file:
 ```
 sudo docker save cf36593ab3a8 --output pycore-g1-v2.tar
 ```
 
-### Load image from tar-archive
+### Load image from tar-archive:
 Using import:
 ```
 docker image import file.tar images_name:image_tag
