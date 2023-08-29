@@ -2,10 +2,11 @@
 CLI - Command Line Interface assistant
 
 ### Create virtual environment using pipenv (Pipfile, Pipefile.lock will be create automatically):
-Follow all packages versions from **pip list**:
+Create environment for custom version of python:
 ```
 pipenv --python 3.8.10
 ```
+Follow to add all packages versions from **pip list**:
 ```
 pipenv install path==16.7.1
 ```
