@@ -32,3 +32,14 @@ pipenv requirements > requirements.txt
 ```
 sudo docker build . -t pycore-g1-v2
 ```
+
+### Run docker-file:
+To avoid Python error "EOFError: EOF when reading a line" occurs when you use the input() function: run in interactive mode with the terminal attached:
+```
+sudo docker run -ti pycore-g1-v2
+```
+
+### Save docker-image to file
+```
+sudo docker save cf36593ab3a8 --output pycore-g1-v2.tar
+```
