@@ -30,6 +30,10 @@ userbook N - друкування інформації посторінково,
 user+ - додавання нової особи до бази даних. 
       example >> user+ Mike 01.01.1990 380123456789 112233445566
       example >> user+ Mike 112233445566 380123456789
+user- - видалення запису вказаної особи 
+      example >> user- Mike
+rename - перейменування запису вказаної особи 
+      example >> rename OldName NewName
 showuser - виводить повну інформацію про особу
       example >> showuser Mike
 phone+ - додавання нового номеру телефона для вказаної особи
@@ -46,9 +50,9 @@ edit-email - змінює/додає електронну адресу для в
       example >> edit-email Mike user@mail.com
 edit-address - змінює/додає географічну адресу для вказаної особи
       example >> edit-address Mike geo-address
-search - виконує пошук інформації по довідковій книзі
-      example >> search Mike
-      example >> search 3809
+user? - виконує пошук контактів за текстом по довідковій книзі
+      example >> user? Mike
+      example >> user? 3809
 note+ - додає нотатку з тегом у записник нотаток
       example >> note+ My first note text
 note- - видаляє нотатку із записника нотаток за вказаним ID нотатки

@@ -47,9 +47,13 @@ class Rich_View(AbstractView):
 [bold red]exit[/bold red] - завершення програми
 [bold red]showall[/bold red] - друкування всієї наявної інформації про користувачів
 [bold red]userbook N[/bold red] - друкування інформації посторінково, де [bold red]N[/bold red] - кількість записів на 1 сторінку
-[bold red]user+[/bold red] - додавання нової особи до бази даних. 
+[bold red]user+[/bold red] - додавання нової особи до бази даних
       example >> [bold blue]user+ Mike 01.01.1990 380123456789 112233445566[/bold blue]
       example >> [bold blue]user+ Mike 112233445566 380123456789[/bold blue]
+[bold red]user-[/bold red] - видалення запису вказаної особи 
+      example >> [bold blue]user- Mike[/bold blue]
+[bold red]rename[/bold red] - перейменування запису вказаної особи 
+      example >> [bold blue]rename OldName NewName[/bold blue]
 [bold red]showuser[/bold red] - виводить повну інформацію про особу
       example >> [bold blue]showuser Mike[/bold blue]
 [bold red]phone+[/bold red] - додавання нового номеру телефона для вказаної особи
@@ -66,9 +70,9 @@ class Rich_View(AbstractView):
       example >> [bold blue]edit-email Mike user@mail.com[/bold blue]
 [bold red]edit-address[/bold red] - змінює/додає географічну адресу для вказаної особи
       example >> [bold blue]edit-address Mike geo-address[/bold blue]
-[bold red]search[/bold red] - виконує пошук інформації по довідковій книзі
-      example >> [bold blue]search Mike[/bold blue]
-      example >> [bold blue]search 3809[/bold blue]
+[bold red]user?[/bold red] - виконує пошук контактів за текстом по довідковій книзі
+      example >> [bold blue]user? Mike[/bold blue]
+      example >> [bold blue]user? 3809[/bold blue]
 [bold red]note+[/bold red] - додає нотатку з тегом у записник нотаток
       example >> [bold blue]note+ My first note text[/bold blue]
 [bold red]note-[/bold red] - видаляє нотатку із записника нотаток за вказаним ID нотатки

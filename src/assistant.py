@@ -112,8 +112,11 @@ def show_note(args):
         return ""
     else: raise ArgsAmountException("Wrong arguments amount. Expected 1 argument")
 
+#=========================================================
+# >> showtag <tag>
+#=========================================================
 @input_error
-def tag_show(args):
+def show_tag(args):
     params = args.strip().split()
     if len(params) == 1:
         tag_key = params[0]
@@ -126,7 +129,7 @@ def tag_show(args):
 # >> note? <text>
 #=========================================================
 @input_error
-def notes_find(args):
+def notes_search(args):
     notes_list = note_book.find_notes(args.strip())
     if notes_list:
         return f"Search result in notes: \n{str(notes_list)}"
@@ -153,13 +156,15 @@ def notes_tag_search(args):
             count = 0
     return ""
 
+#=========================================================
+# >> notebook
+#=========================================================
 @input_error
 def show_note_book(args):
     view.show_note_book(note_book=note_book)
     return ""
 
 #=========================================================
-# Создаёт новый контакт
 # example >> user+ Mike 01.10.1990 +112233445566
 #=========================================================
 @input_error
@@ -187,9 +192,11 @@ def func_new_user(*args):
         else: return "The person is already in database"
     else: raise ArgsAmountException("Wrong arguments amount. Expected 3 arguments")
      
-
+#=========================================================
+# >> showall
+#=========================================================
 @input_error
-def show_contact_book(*args)->str:
+def show_contact_book(*args):
     view.show_contact_book(contact_book=book)
     return ""
 
@@ -215,7 +222,6 @@ def func_book_pages(*args):
 
 
 #=========================================================
-# Изменяет номер телефона
 # >> phone* Mike +112233445566 +380123456789
 #=========================================================
 @input_error 
@@ -304,7 +310,7 @@ def func_list_birthday(*args):
 
 #=========================================================
 # видаляє телефон в існуючому записі особи   
-# >> phone- Mike +380123456789 +112233445566
+# >> phone- Mike +112233445566
 #=========================================================  
 @input_error 
 def func_del_phone(*args):
@@ -352,8 +358,8 @@ def func_del_address(*args):
 
 #=========================================================
 # функція виконує пошук інформації у довідковій книзі
-#              example >> search Mike
-#                      >> search 38073
+# >> search Mike
+# >> search 38073
 #=========================================================
 @input_error
 def func_search(*args):
@@ -392,7 +398,6 @@ def show_help(*args):
 @input_error
 def clear_screen(*args):
     os_name = platform.system().lower()
-    
     if os_name == 'windows':
         os.system('cls')
     elif os_name == 'linux' or os_name == 'darwin':
@@ -403,9 +408,9 @@ def clear_screen(*args):
 COMMANDS = {
     func_exit: ("exit", "end", "bye",),
     func_hello: ("hello", "hy", "welcome",),
-    func_new_user: ("user+", "add+", "add-user", "new", ),
+    func_new_user: ("user+", "add-user",),
+    func_del_user: ("user-", "del-user",),
     func_rename_user: ("rename",),
-    func_del_user: ("user-", "del-user", "delete-user", ),
     func_add_phone: ("phone+", "add-phone", "add_phone",),
     func_del_phone: ("phone-", "del-phone", "del_phone"),
     func_change_phone: ("phone*", "edit-phone", "change-phone",),
@@ -417,7 +422,7 @@ COMMANDS = {
     func_change_email: ("edit-email", "edit_email"),
     func_change_address: ("edit-address", "edit_address"),
     func_list_birthday: ("birthday",),
-    func_search: ("search", "find", "seek"),
+    func_search: ("user?", "search",),
     func_sort_files: ("sort",),
     show_user: ("showuser",),
     show_contact_book: ("showall", "show-all",),
@@ -428,11 +433,11 @@ COMMANDS_NOTES = {
     note_add:   ("note+",   "add-note",),
     note_del:   ("note-",   "del-note",),
     note_change:("note*",   "edit-note",),
-    notes_find: ("note?",   "search-note",),
+    notes_search: ("note?",  "search-note",),
     notes_tag_search: ("note#",),
     add_tags:   ("tags+",   "add_tags", "add-tags",),
     del_tags:   ("tags-",   "del_tags", "del-tags",),
-    tag_show:   ("showtag", "show-tag",),
+    show_tag:   ("showtag", "show-tag",),
     show_note:  ("shownote", "show-note",),
     show_note_book: ("notebook",),
 }
