@@ -1,6 +1,6 @@
 
 from view import AbstractView
-from contact_book import AddressBook, Record, Name, Phone, Email, Birthday, Address, PhoneException, BirthdayException, EmailException
+from contact_book import AddressBook, Record, Name, Phone, Email, Birthday, Address
 from note_book import NoteBook
 
 
@@ -8,14 +8,17 @@ class Console_View(AbstractView):
 
    # вывод в консоль ноут-буки
    def show_note_book(self, note_book: NoteBook):
-      for note in note_book.data.values():
-         print(f"[{(len(note.tags))}] {note.key}: " + note.value)
-      for tag in note_book.tags.values():
-         print("[" + str(tag.sz()) + "]#" + tag.value)
+      if len(note_book.data) == 0:
+         print("The database is empty")
+      else:
+         for note in note_book.data.values():
+            print(f"[{(len(note.tags))}] {note.key}: " + note.value)
+         for tag in note_book.tags.values():
+            print("[" + str(tag.sz()) + "]#" + tag.value)
 
    # вывод в консоль контакт-буки
    def show_contact_book(self, contact_book: AddressBook):
-      if len(contact_book.data) == 0: 
+      if len(contact_book.data) == 0:
          print("The database is empty")
       else:
          for rec in contact_book.values(): print(rec)

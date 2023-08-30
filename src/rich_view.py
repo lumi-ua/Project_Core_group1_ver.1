@@ -1,6 +1,6 @@
 
 from view import AbstractView
-from contact_book import AddressBook, Record, Name, Phone, Email, Birthday, Address, PhoneException, BirthdayException, EmailException
+from contact_book import AddressBook, Record, Name, Phone, Email, Birthday, Address
 from note_book import NoteBook
 
 from rich import print
@@ -13,14 +13,24 @@ class Rich_View(AbstractView):
 
    # вывод в консоль ноут-буки
    def show_note_book(self, note_book: NoteBook):
-      for note in note_book.data.values():
-         print(f"[{(len(note.tags))}] {note.key}: " + note.value)
-      for tag in note_book.tags.values():
-         print("[" + str(tag.sz()) + "]#" + tag.value)
+      if len(note_book.data) == 0: 
+         print("The database is empty")
+      else:
+         table = Table(box=box.DOUBLE)
+         table.add_column("ID", justify="left", no_wrap=True)
+         table.add_column("Note", justify="center", style="cyan", no_wrap=True)
+         table.add_column("Tags", justify="center", style="blue", no_wrap=True)
+         console = Console()
+         result = [table.add_row(
+               note.key,
+               str(note.value), 
+               str("---") if len(note.tags) == 0 else " ".join(["#" + tag for tag in note.tags])
+            ) for note in note_book.data.values()]
+         console.print(table)
 
    # вывод в консоль контакт-буки
    def show_contact_book(self, contact_book: AddressBook):
-      if len(contact_book.data) == 0: 
+      if len(contact_book.data) == 0:
          print("The database is empty")
       else: 
          table = Table(box=box.DOUBLE)
@@ -32,12 +42,12 @@ class Rich_View(AbstractView):
          
          console = Console()
          result = [table.add_row(
-               str(record.name.value), 
-               str(record.birthday.value if record.birthday else "---"), 
-               str(', '.join(map(lambda phone: phone.value, record.phones))), 
-               str(record.email.value    if record.email    else "---"), 
+               str(record.name.value),
+               str(record.birthday.value if record.birthday else "---"),
+               str(', '.join(map(lambda phone: phone.value, record.phones))),
+               str(record.email.value    if record.email    else "---"),
                str(record.address.value  if record.address  else "---")
-                  ) for record in contact_book.data.values()]        
+                  ) for record in contact_book.data.values()]
          console.print(table)
 
    # вывод в консоль хэлпа

@@ -63,8 +63,10 @@ class Phone(Field):
         else:
             #for i in value: 
             #    if i in "+0123456789": correct_phone += i
-            
+
+            # https://scripteverything.com/check-phone-numbers-using-regex-in-python-examples
             correct_phone = re.match(r"(?:\+\d{2})?\d{9,10}", value, re.IGNORECASE)
+
             if correct_phone:
                 correct_phone = correct_phone.string
 
