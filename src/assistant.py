@@ -7,18 +7,18 @@ from contact_book import AddressBook, Record, Name, Phone, Email, Birthday, Addr
 from clean import sort_main
 from note_book import NoteBook
 from console_view import Console_View
+from rich_view import Rich_View
 import readline
 
 path_book = Path(sys.path[0]).joinpath("user_book.bin")
 path_note = Path(sys.path[0]).joinpath("note_book.bin")
 
-view = Console_View()
+view = Rich_View()
 book = AddressBook()
 note_book = NoteBook()
 
 class ArgsAmountException(Exception):
    """Wrong arguments amount exception"""
-        
 
 def input_error(func):
     def wrapper(*args):
@@ -76,7 +76,7 @@ def del_tags(args: str):
     else: return ""
 
 #=========================================================
-# >> note-del <key>
+# >> note- <key>
 #=========================================================
 @input_error
 def note_del(args):
@@ -86,7 +86,7 @@ def note_del(args):
     else: raise ArgsAmountException("Wrong arguments amount. Expected 1 argument")
 
 #=========================================================
-# >> note-change <key> <Text>
+# >> note* <key> <Text>
 #=========================================================
 @input_error
 def note_change(args):
@@ -100,22 +100,8 @@ def note_change(args):
         else: raise TypeError("Note.key wrong type")
     else: raise ArgsAmountException("Unknown argument error")
 
-
 #=========================================================
-# >> note-find <text-fragment>
-#=========================================================
-@input_error
-def notes_find(args):
-    notes_list = note_book.find_notes(args.strip())
-    if notes_list:
-        return f"Search result in notes: \n{str(notes_list)}"
-    else:
-        return f"No one notes was found for fragment: '{args}'"
-
-
-#=========================================================
-# >> note-show <int: необов'язковий аргумент кількості рядків>
-# example >> note show 15
+# >> shownote <key>
 #=========================================================
 @input_error
 def show_note(args):
@@ -137,8 +123,19 @@ def tag_show(args):
     return ""
 
 #=========================================================
-# >> n-search <text>
-# пошук та сортування нотаток за ключовими словами
+# >> note? <text-fragment>
+#=========================================================
+@input_error
+def notes_find(args):
+    notes_list = note_book.find_notes(args.strip())
+    if notes_list:
+        return f"Search result in notes: \n{str(notes_list)}"
+    else:
+        return f"No one notes was found for fragment: '{args}'"
+
+#=========================================================
+# >> note# <text>
+# пошук та сортування нотаток за текстом в ключових словах
 #=========================================================
 @input_error
 def notes_tag_search(args):
@@ -163,7 +160,7 @@ def show_note_book(args):
 
 #=========================================================
 # Создаёт новый контакт
-# example >> add Mike 02.10.1990 +380504995876
+# example >> user+ Mike 02.10.1990 +380504995876
 #=========================================================
 @input_error
 def func_new_user(*args):
@@ -197,28 +194,28 @@ def show_contact_book(*args)->str:
     return ""
 
 #=========================================================
-# >> show-book /N
-# друкує книгу контактів по N записів
-# де N - це кількість записів на одній сторінці
+# >> userbook N
+# друкує книгу контактів по N записів, якщо без параметрів - то по одному запису
 #=========================================================
 @input_error
 def func_book_pages(*args):
-    n = int(re.sub("\D", "", args[0]))
+    n = 1
+    if (len(args) == 1): n = int(re.sub("\D", "", args[0]))
     n_page = 0
     for batch in book._record_generator(N=n):
         n_page += 1
         print(f"{'='*14} Page #{n_page} {'='*16}")
         for record in batch:
             print(str(record))
-        print("="*40)    
-        print("Press Enter", end="")
+        print("="*40)
+        print("Press Enter ", end="")
         input("to continue next page...")
     return f"End of the ContactBook" 
 
 
 #=========================================================
 # Изменяет номер телефона
-# >> change-phone Mike +38099 +38050777
+# >> phone* Mike +38099 +38050777
 #=========================================================
 @input_error 
 def func_change_phone(*args):
@@ -246,7 +243,7 @@ def no_command(*args):
     return func_hello(args=args)
 
 #=========================================================
-# >> phone <username>
+# >> showuser <username>
 #=========================================================
 @input_error
 def show_user(*args):
@@ -256,9 +253,8 @@ def show_user(*args):
         return ""
     else: raise ArgsAmountException('Wrong arguments amount. Missed "Name" of the person')
 
-
 #========================================================= 
-# >> add-phone Mike +380509998877 +380732225566
+# >> phone+ Mike +380509998877 +380732225566
 #=========================================================
 @input_error
 def func_add_phone(*args):
@@ -270,7 +266,7 @@ def func_add_phone(*args):
 
 
 #=========================================================  
-# >> change-birthday Mike 12.05.1990
+# >> edit-birthday Mike 12.05.1990
 #=========================================================
 @input_error
 def func_change_birthday(*args):
@@ -307,13 +303,13 @@ def func_list_birthday(*args):
 
 #=========================================================
 # видаляє телефон або список телефонів в існуючому записі особи Mike   
-# >> del phone Mike +380509998877 +380732225566
+# >> phone- Mike +380509998877 +380732225566
 #=========================================================  
 @input_error 
 def func_del_phone(*args):
     if (len(args) == 2):
         name = args[0].capitalize()
-        # формуємо список  об'єктів Phone, тому що на майбутнє хочу реалізувати видалення декількох телефонів 
+        # формуємо список об'єктів Phone, на майбутнє реалізувати видалення декількох телефонів 
         #lst_del_phones = list(map(lambda phone: Phone(phone), args)) 
         return book[name].del_phone(Phone(args[1]))
     else: raise ArgsAmountException("Wrong arguments amount. Expected 2 arguments")
@@ -411,11 +407,11 @@ COMMANDS = {
     func_del_user: ("user-", "del-user", "delete-user", ),
     func_add_phone: ("phone+", "add-phone", "add_phone",),
     func_del_phone: ("phone-", "del-phone", "del_phone"),
+    func_change_phone: ("phone*", "edit-phone", "change-phone",),
     func_del_birthday: ("del-birthday", "del_birthday"),
     func_del_email: ("del-email", "del_email"),
     func_del_address: ("del-address", "del_address"),
-    func_change_phone: ("edit-phone", "change-phone", "change_phone"),
-    func_book_pages: ("show-book", "show_book", "showbook"),
+    func_book_pages: ("userbook", "showbook"),
     func_change_birthday: ("edit-birthday", "edit_birthday"),
     func_change_email: ("edit-email", "edit_email"),
     func_change_address: ("edit-address", "edit_address"),
@@ -423,15 +419,15 @@ COMMANDS = {
     func_search: ("search", "find", "seek"),
     func_sort_files: ("sort",),
     show_user: ("showuser",),
-    show_contact_book: ("showall", "show-all", "userbook",),
+    show_contact_book: ("showall", "show-all",),
     show_help: ("help", "?",),
 }
 
 COMMANDS_NOTES = {
     note_add:   ("note+",   "add-note",),
     note_del:   ("note-",   "del-note",),
-    note_change:("note*",   "change-note",),
-    notes_find: ("note?",   "find-note",),
+    note_change:("note*",   "edit-note",),
+    notes_find: ("note?",   "search-note",),
     notes_tag_search: ("note#",),
     add_tags:   ("tags+",   "add_tags", "add-tags",),
     del_tags:   ("tags-",   "del_tags", "del-tags",),
