@@ -61,12 +61,7 @@ class Phone(Field):
             self.__value = value
             raise PhoneException("Incorrect phone format: None")
         else:
-            #for i in value: 
-            #    if i in "+0123456789": correct_phone += i
-
-            # https://scripteverything.com/check-phone-numbers-using-regex-in-python-examples
             correct_phone = re.match(r"(?:\+\d{2})?\d{9,10}", value, re.IGNORECASE)
-
             if correct_phone:
                 correct_phone = correct_phone.string
 
@@ -136,20 +131,15 @@ class Email(Field):
                 raise EmailException("Invalid email address!")
             else:
                 self.__value = value
-      
 
-#========================================================
-# Класс Record, который отвечает за логику 
-#  - добавления/удаления/редактирования
-# необязательных полей и хранения обязательного поля Name
-#=========================================================
+
 class Record():
     def __init__(self, name:Name, phones: list, email: Email=None, birthday: Birthday=None, address: Address=None) -> None:
         self.name = name
         self.email = email
         self.birthday = birthday
         self.address = address
-        self.phones = []            
+        self.phones = []
         self.phones.extend(phones)
 
 
@@ -215,7 +205,7 @@ class Record():
     
     
     # перевіряє наявність 1(одного)телефону у списку
-    def check_dublicate_phone(self, search_phone: str) ->bool:  
+    def check_dublicate_phone(self, search_phone: str) ->bool:
         result = list(map(lambda phone: any(phone.value == search_phone), self.data[self.name.value].phones))
         return True if result else False
     
@@ -270,7 +260,7 @@ class AddressBook(UserDict):
     def save_database(self, path):
         with open(path, "wb") as f_out:
             pickle.dump(self.data, f_out)
-        return f"The database is saved = {len(self.data)} records"    
+        return f"The database is saved = {len(self.data)} records"
             
     # генератор посторінкового друку
     def _record_generator(self, N=10):
