@@ -1,4 +1,4 @@
-## ProjectCore-group1-v2
+## PythonCore-group1-v2
 CLI - Command Line Interface assistant
 
 ### Creating virtual environment:
