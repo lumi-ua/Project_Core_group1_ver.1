@@ -390,7 +390,7 @@ def func_sort_files(*args):
 @input_error
 def show_help(*args):
     view.show_help()
-    return "assistant v.135"
+    return "assistant v.136"
 
 @input_error
 def clear_screen(*args):
@@ -454,11 +454,6 @@ def complete(text, state):
                     results.append(kwd)
     results.append(None)
     return results[state]
-################################################################
-# set and bind autocomplete function 
-readline.parse_and_bind("tab: complete")
-readline.set_completer(complete)
-################################################################
 
 def parser(text: str):
     for cmd, kwds in COMMANDS.items():
@@ -493,4 +488,7 @@ def main():
         if result: print(result)
 ################################################################
 if __name__ == "__main__":
+    # set and bind autocomplete function 
+    readline.parse_and_bind("tab: complete")
+    readline.set_completer(complete)
     main()
