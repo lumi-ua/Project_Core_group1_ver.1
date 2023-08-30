@@ -81,10 +81,12 @@ class Birthday(Field):
         if value == None: 
             self.__value = None
         else:
-            pattern = r"^\d{2}(\.|\-|\/)\d{2}\1\d{4}$"  # дозволені дати формату DD.MM.YYYY 
+            # DD.MM.YYYY, DD-MM-YYYY, DD/MM/YYYY 
+            pattern = r"^\d{2}(\.|\-|\/)\d{2}\1\d{4}$"
             if re.match(pattern, value):
-                self.__value = re.sub("[-/]", ".", value)  # комбінувати символи ЗАБОРОНЕНО DD.MM-YYYY 
-            else: 
+                # заменяем слэши и дефисы на точки - приводим к одному формату
+                self.__value = re.sub("[-/]", ".", value)
+            else:
                 self.__value = None
                 # устанавливаем None - для валидации 
                 #raise BirthdayException("Unauthorized birthday format")
@@ -213,7 +215,6 @@ class AddressBook(UserDict):
                 if phone.value.find(text.lower()) >= 0:
                     result.append(rec)
                     break
-
         return result
 
     def get_list_birthday(self, count_day: int):
