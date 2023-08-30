@@ -47,6 +47,7 @@ class Rich_View(AbstractView):
 [bold red]exit[/bold red] - завершення програми
 [bold red]showall[/bold red] - друкування всієї наявної інформації про користувачів
 [bold red]userbook N[/bold red] - друкування інформації посторінково, де [bold red]N[/bold red] - кількість записів на 1 сторінку
+      example >> [bold blue]userbook 10[/bold blue]
 [bold red]user+[/bold red] - додавання нової особи до бази даних
       example >> [bold blue]user+ Mike 01.01.1990 380123456789 112233445566[/bold blue]
       example >> [bold blue]user+ Mike 112233445566 380123456789[/bold blue]
@@ -54,7 +55,7 @@ class Rich_View(AbstractView):
       example >> [bold blue]user- Mike[/bold blue]
 [bold red]rename[/bold red] - перейменування запису вказаної особи 
       example >> [bold blue]rename OldName NewName[/bold blue]
-[bold red]showuser[/bold red] - виводить повну інформацію про особу
+[bold red]showuser[/bold red] - виводить повну інформацію про вказану особу
       example >> [bold blue]showuser Mike[/bold blue]
 [bold red]phone+[/bold red] - додавання нового номеру телефона для вказаної особи
       example >> [bold blue]phone+ Mike 380123456789[/bold blue]
@@ -81,7 +82,7 @@ class Rich_View(AbstractView):
       example >> [bold blue]note* 1 My first note text[/bold blue]
 [bold red]note?[/bold red] - здійснює пошук нотаток за текстом
       example >> [bold blue]note? text_in_note[/bold blue]
-[bold red]note#[/bold red] - здійснює пошук та сортування нотаток з текстом у ключових словах (використовує пейджинацію)
+[bold red]note#[/bold red] - здійснює пошук та сортування нотаток з текстом у ключових словах (використовується пейджинація)
       example >> [bold blue]note# text_in_tag[/bold blue]
 [bold red]tag+[/bold red] - додає нові теги до нотатки за вказаним ID нотатки
       example >> [bold blue]tag+ 1 tag0 tag1 tag2[/bold blue]

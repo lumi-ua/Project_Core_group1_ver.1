@@ -202,7 +202,7 @@ def show_contact_book(*args):
 
 #=========================================================
 # >> userbook N
-# друкує книгу контактів по N записів, якщо без параметрів - то по одному запису
+# друкує книгу контактів по N записів, якщо без параметру - то по одному запису
 #=========================================================
 @input_error
 def func_book_pages(*args):
@@ -357,7 +357,6 @@ def func_del_address(*args):
     else: raise ArgsAmountException("Wrong arguments amount. Expected 1 arguments")
 
 #=========================================================
-# функція виконує пошук інформації у довідковій книзі
 # >> search Mike
 # >> search 38073
 #=========================================================
@@ -393,7 +392,7 @@ def func_sort_files(*args):
 @input_error
 def show_help(*args):
     view.show_help()
-    return "v.126"
+    return "v.127"
 
 @input_error
 def clear_screen(*args):
