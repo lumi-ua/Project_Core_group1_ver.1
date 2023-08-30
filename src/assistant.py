@@ -218,7 +218,7 @@ def func_book_pages(*args):
         print("="*40)
         print("Press Enter ", end="")
         input("to continue next page...")
-    return f"End of the ContactBook" 
+    return f"End of the ContactBook"
 
 
 #=========================================================
