@@ -390,7 +390,7 @@ def func_sort_files(*args):
 @input_error
 def show_help(*args):
     view.show_help()
-    return "assistant v.129"
+    return "assistant v.133"
 
 @input_error
 def clear_screen(*args):
@@ -479,7 +479,7 @@ def parser(text: str):
 def main():
     global path_book
     global path_note
-    book.load_database(path_book)
+    book.load_file(path_book)
     note_book.load_file(path_note)
 
     while True:

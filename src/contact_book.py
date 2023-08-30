@@ -38,7 +38,6 @@ class Field():
     def __repr__(self) -> str:
         return str(self.value)
     
-# клас Ім'я
 class Name(Field):
     @property
     def value(self):
@@ -49,7 +48,6 @@ class Name(Field):
         self.__value = value
 
 
-# клас Телефон
 class Phone(Field): 
     @property
     def value(self):
@@ -73,7 +71,6 @@ class Phone(Field):
             else: raise PhoneException("Incorrect phone format")
 
     
-# клас День народження        
 class Birthday(Field):
     @property
     def value(self):
@@ -85,7 +82,7 @@ class Birthday(Field):
             self.__value = None
         else:
             pattern = r"^\d{2}(\.|\-|\/)\d{2}\1\d{4}$"  # дозволені дати формату DD.MM.YYYY 
-            if re.match(pattern, value):         # альтернатива для крапки: "-" "/"
+            if re.match(pattern, value):
                 self.__value = re.sub("[-/]", ".", value)  # комбінувати символи ЗАБОРОНЕНО DD.MM-YYYY 
             else: 
                 self.__value = None
@@ -93,7 +90,7 @@ class Birthday(Field):
                 #raise BirthdayException("Unauthorized birthday format")
 
     # возвращает количество дней перед днём рождения
-    def days_to_birthday(self) -> int:
+    def days_to_birthday(self):
         if self.value:
             # возвращает количество дней до следующего дня рождения.
             # если положительное то др еще не наступил, если отрицательное то уже прошел
@@ -179,13 +176,10 @@ class Record():
         return f"{self.name.value} | " + result
 
 
-    # Done - розширюємо існуючий список телефонів особи - Done
-    # НОВИМ телефоном або декількома телефонами для особи - Done
     def add_phone(self, list_phones) -> str:
         self.phones.extend(list_phones)
         return f"The phones was/were added successfully"
     
-    # Done - видаляємо телефони із списку телефонів особи - Done!
     def del_phone(self, del_phone: Phone) -> str:
         error = True
         for phone in self.phones:
@@ -197,14 +191,12 @@ class Record():
         if error: return f"Entered incorrect phone number."
         else: return f"The phone {phone.value} was deleted successfully"
     
-    # Done = редагування запису(телефону) у книзі особи - Done
     def edit_phone(self, old_phone: Phone, new_phone: Phone) -> str:
         index = next((i for i, obj in enumerate(self.phones) if obj.value == old_phone.value), -1)
         self.phones[index]= new_phone
         return f"User set new phone-number successfully"
     
     
-    # перевіряє наявність 1(одного)телефону у списку
     def check_dublicate_phone(self, search_phone: str) ->bool:
         result = list(map(lambda phone: any(phone.value == search_phone), self.data[self.name.value].phones))
         return True if result else False
@@ -245,24 +237,20 @@ class AddressBook(UserDict):
         self.data[new_name] = rec
         return f"successfully renamed from:{old_name} to:{new_name}"
     
-    # завантаження записів книги із файлу
-    def load_database(self, path):
+    def load_file(self, path):
         if path.exists():
             with open(path, "rb") as fr_bin:
-                self.data = pickle.load(fr_bin) # копирование Словника   load_data = pickle.load(fr_bin)
-                                                # self.data = {**load_data}
+                self.data = pickle.load(fr_bin)
+                # load_data = pickle.load(fr_bin)
+                # self.data = {**load_data}
             return f"The database has been loaded = {len(self.data)} records"
         return ""
     
-    #-----------------------------------------
-    # збереження записів книги у файл
-    #-------------------------------------------
     def save_database(self, path):
         with open(path, "wb") as f_out:
             pickle.dump(self.data, f_out)
         return f"The database is saved = {len(self.data)} records"
             
-    # генератор посторінкового друку
     def _record_generator(self, N=10):
         records = list(self.data.values())
         total_records = len(records)
