@@ -231,7 +231,6 @@ def func_change_phone(*args):
         return book[name].edit_phone(Phone(args[1]), Phone(args[2]))
     else: raise ArgsAmountException("Wrong arguments amount. Expected 3 arguments")
 
-
 @input_error
 def func_exit(*args):
     book.save_database(path_book)
@@ -357,7 +356,7 @@ def func_del_address(*args):
 
 #=========================================================
 # >> search Mike
-# >> search 38073
+# >> search 3809
 #=========================================================
 @input_error
 def func_search(*args):
