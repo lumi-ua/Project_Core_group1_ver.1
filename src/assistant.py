@@ -204,9 +204,10 @@ def func_book_pages(*args):
     n_page = 0
     for batch in book._record_generator(N=n):
         n_page += 1
-        print(f"{'='*14} Page #{n_page} {'='*16}")
+        print(f"{'='*15} Page #{n_page} {'='*16}")
         for record in batch:
             print(str(record))
+        if len(batch) < n: break
         print("="*40)
         print("Press Enter ", end="")
         input("to continue next page...")

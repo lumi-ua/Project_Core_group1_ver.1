@@ -49,7 +49,7 @@ class Rich_View(AbstractView):
 [bold red]userbook N[/bold red] - друкування інформації посторінково, де [bold red]N[/bold red] - кількість записів на 1 сторінку
 [bold red]user+[/bold red] - додавання нової особи до бази даних. 
       example >> [bold blue]user+ Mike 01.01.1990 380123456789 112233445566[/bold blue]
-            >> [bold blue]user+ Mike 112233445566 380123456789[/bold blue]
+      example >> [bold blue]user+ Mike 112233445566 380123456789[/bold blue]
 [bold red]showuser[/bold red] - виводить повну інформацію про особу
       example >> [bold blue]showuser Mike[/bold blue]
 [bold red]phone+[/bold red] - додавання нового номеру телефона для вказаної особи
