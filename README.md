@@ -20,7 +20,7 @@ pipenv install pyreadline3==3.4.1
 pipenv install pickleshare==0.7.5
 ```
 
-### Run inside environment:
+### Run app in environment:
 ```
 pipenv run python ./src/assistant.py
 ```
