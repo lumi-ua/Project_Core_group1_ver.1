@@ -61,14 +61,18 @@ class Phone(Field):
             self.__value = value
             raise PhoneException("Incorrect phone format: None")
         else:
-            correct_phone = ""
-            for i in value: 
-                if i in "+0123456789": correct_phone += i
+            #for i in value: 
+            #    if i in "+0123456789": correct_phone += i
+            
+            correct_phone = re.match(r"(?:\+\d{2})?\d{9,10}", value, re.IGNORECASE)
+            if correct_phone:
+                correct_phone = correct_phone.string
 
-            if len(correct_phone) == 13: self.__value = correct_phone # "+380123456789"
-            elif len(correct_phone) == 12: self.__value = "+" + correct_phone # "380123456789"
-            elif len(correct_phone) == 10: self.__value = "+38" + correct_phone # "0123456789"
-            elif len(correct_phone) == 9: self.__value = "+380" + correct_phone # "123456789"
+                if len(correct_phone) == 13:   self.__value = correct_phone          # "+380123456789"
+                elif len(correct_phone) == 12: self.__value = "+" + correct_phone    # "380123456789"
+                elif len(correct_phone) == 10: self.__value = "+38" + correct_phone  # "0123456789"
+                elif len(correct_phone) == 9:  self.__value = "+380" + correct_phone # "123456789"
+                else: raise PhoneException("Incorrect phone format!")
             else: raise PhoneException("Incorrect phone format")
 
     

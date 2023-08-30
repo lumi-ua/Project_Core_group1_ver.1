@@ -271,7 +271,6 @@ def func_add_phone(*args):
         return book[name].add_phone([Phone(phone) for phone in phones])
     else: raise ArgsAmountException("Wrong arguments amount. Expected 2 arguments")
 
-
 #=========================================================  
 # >> edit-birthday Mike 01.01.1990
 #=========================================================
@@ -392,7 +391,7 @@ def func_sort_files(*args):
 @input_error
 def show_help(*args):
     view.show_help()
-    return "v.127"
+    return "v.128"
 
 @input_error
 def clear_screen(*args):
