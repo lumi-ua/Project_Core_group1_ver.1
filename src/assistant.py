@@ -390,7 +390,7 @@ def func_sort_files(*args):
 @input_error
 def show_help(*args):
     view.show_help()
-    return "assistant v.138"
+    return "assistant v.143"
 
 @input_error
 def clear_screen(*args):

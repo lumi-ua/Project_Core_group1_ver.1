@@ -73,7 +73,7 @@ class Rich_View(AbstractView):
       example >> [bold blue]phone* Mike 380123456789 112233445566[/bold blue]
 [bold red]phone-[/bold red] - видаляє телефон для вказаної особи
       example >> [bold blue]phone- Mike 380123456789[/bold blue]
-[bold red]birthday[/bold red] - повертає список контактів, у яких день народження через задану кількість днів від поточної дати
+[bold red]birthday[/bold red] - виводить список контактів, у яких день народження через задану кількість днів від поточної дати
       example >> [bold blue]birthday 5[/bold blue]
 [bold red]edit-birthday[/bold red] - змінює/додає Дату народження для вказаної особи
       example >> [bold blue]edit-birthday Mike 01.01.1990[/bold blue]
@@ -84,7 +84,7 @@ class Rich_View(AbstractView):
 [bold red]user?[/bold red] - виконує пошук контактів за текстом по довідковій книзі
       example >> [bold blue]user? Mike[/bold blue]
       example >> [bold blue]user? 3809[/bold blue]
-[bold red]note+[/bold red] - додає нотатку з тегом у записник нотаток
+[bold red]note+[/bold red] - додає нотатку в записник нотаток
       example >> [bold blue]note+ My first note text[/bold blue]
 [bold red]note-[/bold red] - видаляє нотатку із записника нотаток за вказаним ID нотатки
       example >> [bold blue]note- 1[/bold blue]
@@ -96,9 +96,10 @@ class Rich_View(AbstractView):
       example >> [bold blue]note# text_in_tag[/bold blue]
 [bold red]tag+[/bold red] - додає нові теги до нотатки за вказаним ID нотатки
       example >> [bold blue]tag+ 1 tag0 tag1 tag2[/bold blue]
-[bold red]tag-[/bold red] - видаляє теги з нотатки за вказаним ID нотатки. Якщо не вказаний тег, то видаляються всі теги нотатки
+[bold red]tag-[/bold red] - видаляє теги нотатки за вказаним ID нотатки. Якщо тег не вказаний, то видаляються всі теги вказаної нотатки
       example >> [bold blue]tag- 1 tag0 tag1 tag2[/bold blue]
-[bold red]showtag[/bold red] - виводить лист всіх нотаток, в яких є заданий тег
+      example >> [bold blue]tag- 1[/bold blue]
+[bold red]showtag[/bold red] - виводить всі нотатки, в яких є заданий тег
       example >> [bold blue]showtag mytag[/bold blue]
 [bold red]shownote[/bold red] - виводить вміст нотатки за вказаним ID нотатки
       example >> [bold blue]shownote 1[/bold blue]
