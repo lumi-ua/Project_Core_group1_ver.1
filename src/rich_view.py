@@ -52,11 +52,11 @@ class Rich_View(AbstractView):
 
    # вывод в консоль хэлпа
    def show_help(self):
-         print("""[bold red]cls[/bold red] - очищення екрану від інформації
-[bold red]hello[/bold red] - стартове вітання
+         print("""[bold red]cls[/bold red] - очищення консолі від тексту
+[bold red]hello[/bold red] - виводить стартове вітання
 [bold red]exit[/bold red] - завершення програми
-[bold red]showall[/bold red] - друкування всієї наявної інформації про всіх користувачів
-[bold red]userbook N[/bold red] - друкування інформації посторінково, де [bold red]N[/bold red] - кількість записів на 1 сторінку
+[bold red]showall[/bold red] - виводить всю наявну інформацію про всіх користувачів
+[bold red]userbook N[/bold red] - виводить інформацію про користувачів посторінково, де [bold red]N[/bold red] - кількість записів на 1 сторінку
       example >> [bold blue]userbook 10[/bold blue]
 [bold red]user+[/bold red] - додавання нової особи до книги контактів
       example >> [bold blue]user+ Mike 01.01.1990 380123456789 112233445566[/bold blue]
@@ -75,7 +75,7 @@ class Rich_View(AbstractView):
       example >> [bold blue]phone- Mike 380123456789[/bold blue]
 [bold red]birthday[/bold red] - виводить список контактів, у яких день народження через задану кількість днів від поточної дати
       example >> [bold blue]birthday 5[/bold blue]
-[bold red]edit-birthday[/bold red] - змінює/додає Дату народження для вказаної особи
+[bold red]edit-birthday[/bold red] - змінює/додає дату народження для вказаної особи
       example >> [bold blue]edit-birthday Mike 01.01.1990[/bold blue]
 [bold red]edit-email[/bold red] - змінює/додає електронну адресу для вказаної особи
       example >> [bold blue]edit-email Mike user@mail.com[/bold blue]
@@ -84,7 +84,7 @@ class Rich_View(AbstractView):
 [bold red]user?[/bold red] - виконує пошук контактів за текстом по довідковій книзі
       example >> [bold blue]user? Mike[/bold blue]
       example >> [bold blue]user? 3809[/bold blue]
-[bold red]note+[/bold red] - додає нотатку в записник нотаток
+[bold red]note+[/bold red] - додає нову нотатку в записнику нотаток
       example >> [bold blue]note+ My first note text[/bold blue]
 [bold red]note-[/bold red] - видаляє нотатку із записника нотаток за вказаним ID нотатки
       example >> [bold blue]note- 1[/bold blue]
