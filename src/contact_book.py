@@ -18,7 +18,7 @@ class EmailException(Exception):
 
 
 class Field():
-    def __init__(self, value) -> None:
+    def __init__(self, value):
         self.__value = None
         self.value = value  #call setter of inheritor
     
@@ -128,7 +128,7 @@ class Email(Field):
 
 
 class Record():
-    def __init__(self, name:Name, phones: list, email: Email=None, birthday: Birthday=None, address: Address=None) -> None:
+    def __init__(self, name: Name, phones: list, email: Email=None, birthday: Birthday=None, address: Address=None):
         self.name = name
         self.email = email
         self.birthday = birthday
