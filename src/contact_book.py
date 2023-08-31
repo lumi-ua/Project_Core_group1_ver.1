@@ -45,24 +45,25 @@ class Name(Field):
 class Phone(Field):
     @property
     def value(self):
-        return self.__value 
+        return super().value
     
     @value.setter
     def value(self, value):
         if value == None: 
-            self.__value = value
             raise PhoneException("Incorrect phone format: None")
         else:
             correct_phone = re.match(r"(?:\+\d{2})?\d{9,10}", value, re.IGNORECASE)
             if correct_phone:
-                correct_phone = correct_phone.string
+                phone = correct_phone.string
 
-                if len(correct_phone) == 13:   self.__value = correct_phone          # "+380123456789"
-                elif len(correct_phone) == 12: self.__value = "+" + correct_phone    # "380123456789"
-                elif len(correct_phone) == 10: self.__value = "+38" + correct_phone  # "0123456789"
-                elif len(correct_phone) == 9:  self.__value = "+380" + correct_phone # "123456789"
+                if len(phone) == 13:   correct_phone = phone          # "+380123456789"
+                elif len(phone) == 12: correct_phone = "+" + phone    # "380123456789"
+                elif len(phone) == 10: correct_phone = "+38" + phone  # "0123456789"
+                elif len(phone) == 9:  correct_phone = "+380" + phone # "123456789"
                 else: raise PhoneException("Incorrect phone format!")
-            else: raise PhoneException("Incorrect phone format")
+                super(Phone, Phone).value.__set__(self, correct_phone)
+            else:
+                raise PhoneException("Incorrect phone format")
 
 
 class Birthday(Field):
@@ -169,7 +170,7 @@ class Record():
 
     def add_phone(self, list_phones) -> str:
         self.phones.extend(list_phones)
-        return f"The phones was/were added successfully"
+        return f"Phone-numbers was added successfully"
     
     def del_phone(self, del_phone: Phone) -> str:
         error = True

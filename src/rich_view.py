@@ -47,7 +47,7 @@ class Rich_View(AbstractView):
                str(', '.join(map(lambda phone: phone.value, record.phones))),
                str(record.email    if record.email    else "---"),
                str(record.address  if record.address  else "---")
-                  ) for record in contact_book.data.values()]
+            ) for record in contact_book.data.values()]
          console.print(table)
 
    # вывод в консоль хэлпа
