@@ -42,26 +42,26 @@ class Rich_View(AbstractView):
          
          console = Console()
          result = [table.add_row(
-               str(record.name.value),
-               str(record.birthday.value if record.birthday else "---"),
+               str(record.name),
+               str(record.birthday if record.birthday else "---"),
                str(', '.join(map(lambda phone: phone.value, record.phones))),
-               str(record.email.value    if record.email    else "---"),
-               str(record.address.value  if record.address  else "---")
-                  ) for record in contact_book.data.values()]
+               str(record.email    if record.email    else "---"),
+               str(record.address  if record.address  else "---")
+            ) for record in contact_book.data.values()]
          console.print(table)
 
    # вывод в консоль хэлпа
    def show_help(self):
          print("""[bold red]cls[/bold red] - очищення екрану від інформації
-[bold red]hello[/bold red] - вітання
+[bold red]hello[/bold red] - стартове вітання
 [bold red]exit[/bold red] - завершення програми
-[bold red]showall[/bold red] - друкування всієї наявної інформації про користувачів
+[bold red]showall[/bold red] - друкування всієї наявної інформації про всіх користувачів
 [bold red]userbook N[/bold red] - друкування інформації посторінково, де [bold red]N[/bold red] - кількість записів на 1 сторінку
       example >> [bold blue]userbook 10[/bold blue]
-[bold red]user+[/bold red] - додавання нової особи до бази даних
+[bold red]user+[/bold red] - додавання нової особи до книги контактів
       example >> [bold blue]user+ Mike 01.01.1990 380123456789 112233445566[/bold blue]
       example >> [bold blue]user+ Mike 112233445566 380123456789[/bold blue]
-[bold red]user-[/bold red] - видалення запису вказаної особи 
+[bold red]user-[/bold red] - видалення запису вказаної особи з книги контактів
       example >> [bold blue]user- Mike[/bold blue]
 [bold red]rename[/bold red] - перейменування запису вказаної особи 
       example >> [bold blue]rename OldName NewName[/bold blue]
