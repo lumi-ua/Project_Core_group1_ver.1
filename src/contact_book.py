@@ -37,7 +37,7 @@ class Field():
 
     def __repr__(self) -> str:
         return str(self.value)
-    
+
 class Name(Field):
     @property
     def value(self):
@@ -48,7 +48,7 @@ class Name(Field):
         self.__value = value
 
 
-class Phone(Field): 
+class Phone(Field):
     @property
     def value(self):
         return self.__value 
@@ -70,7 +70,7 @@ class Phone(Field):
                 else: raise PhoneException("Incorrect phone format!")
             else: raise PhoneException("Incorrect phone format")
 
-    
+
 class Birthday(Field):
     @property
     def value(self):
@@ -113,7 +113,7 @@ class Address(Field):
     @value.setter
     def value(self, value: str):
         self.__value = value
-  
+
 
 class Email(Field):
     @property
@@ -197,12 +197,13 @@ class Record():
         index = next((i for i, obj in enumerate(self.phones) if obj.value == old_phone.value), -1)
         self.phones[index]= new_phone
         return f"User set new phone-number successfully"
-    
-    
+
+
     def check_dublicate_phone(self, search_phone: str) ->bool:
         result = list(map(lambda phone: any(phone.value == search_phone), self.data[self.name.value].phones))
         return True if result else False
-    
+
+
 class AddressBook(UserDict):
 
     def search(self, text):
