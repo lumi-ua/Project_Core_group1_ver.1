@@ -42,11 +42,11 @@ class Rich_View(AbstractView):
          
          console = Console()
          result = [table.add_row(
-               str(record.name.value),
-               str(record.birthday.value if record.birthday else "---"),
+               str(record.name),
+               str(record.birthday if record.birthday else "---"),
                str(', '.join(map(lambda phone: phone.value, record.phones))),
-               str(record.email.value    if record.email    else "---"),
-               str(record.address.value  if record.address  else "---")
+               str(record.email    if record.email    else "---"),
+               str(record.address  if record.address  else "---")
                   ) for record in contact_book.data.values()]
          console.print(table)
 

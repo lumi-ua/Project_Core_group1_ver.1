@@ -20,7 +20,7 @@ class EmailException(Exception):
 class Field():
     def __init__(self, value) -> None:
         self.__value = None
-        self.value = value
+        self.value = value  #call setter of inheritor
     
     @property
     def value(self):
@@ -39,13 +39,7 @@ class Field():
         return str(self.value)
 
 class Name(Field):
-    @property
-    def value(self):
-        return self.__value
-    
-    @value.setter
-    def value(self, value):
-        self.__value = value
+    pass
 
 
 class Phone(Field):
@@ -74,20 +68,21 @@ class Phone(Field):
 class Birthday(Field):
     @property
     def value(self):
-        return self.__value
+        return super().value
     
     @value.setter
     def value(self, value: str):
         if value == None: 
-            self.__value = None
+            super(Birthday, Birthday).value.__set__(self, None)
         else:
             # DD.MM.YYYY, DD-MM-YYYY, DD/MM/YYYY 
             pattern = r"^\d{2}(\.|\-|\/)\d{2}\1\d{4}$"
             if re.match(pattern, value):
                 # заменяем слэши и дефисы на точки - приводим к одному формату
-                self.__value = re.sub("[-/]", ".", value)
+                result = re.sub("[-/]", ".", value)
+                super(Birthday, Birthday).value.__set__(self, result)
             else:
-                self.__value = None
+                super(Birthday, Birthday).value.__set__(self, None)
                 # устанавливаем None - для валидации 
                 #raise BirthdayException("Unauthorized birthday format")
 
@@ -106,30 +101,24 @@ class Birthday(Field):
 
 
 class Address(Field):
-    @property
-    def value(self):
-        return self.__value
-    
-    @value.setter
-    def value(self, value: str):
-        self.__value = value
+    pass
 
 
 class Email(Field):
     @property
     def value(self):
-        return self.__value
+        return super().value
     
     @value.setter
     def value(self, value: str):
         if value == None: 
-            self.__value = None
+            super(Email, Email).value.__set__(self, None)
         else:
             pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
             if not re.match(pattern, value):
                 raise EmailException("Invalid email address!")
             else:
-                self.__value = value
+                super(Email, Email).value.__set__(self, value)
 
 
 class Record():
@@ -169,13 +158,13 @@ class Record():
     def __str__(self) -> str:
         result = f"{', '.join(map(lambda phone: phone.value, self.phones))}"
         if self.birthday != None:
-            result = f"{self.birthday.value} | " + result
+            result = f"{self.birthday} | " + result
         if self.email != None:
-            result = f"{self.email.value} | " + result
+            result = f"{self.email} | " + result
         if self.address != None:
-            result = f"{self.address.value} | " + result
+            result = f"{self.address} | " + result
 
-        return f"{self.name.value} | " + result
+        return f"{self.name} | " + result
 
 
     def add_phone(self, list_phones) -> str:
