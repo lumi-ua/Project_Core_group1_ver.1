@@ -49,9 +49,11 @@ class Phone(Field):
     
     @value.setter
     def value(self, value):
-        if value == None: 
+        if value == None:
+            # не может быть пустым, поэтому генерируем исключение
             raise PhoneException("Incorrect phone format: None")
         else:
+            # не может быть невалидным, поэтому генерируем искючение
             correct_phone = re.match(r"(?:\+\d{2})?\d{9,10}", value, re.IGNORECASE)
             if correct_phone:
                 phone = correct_phone.string
@@ -73,10 +75,12 @@ class Birthday(Field):
     
     @value.setter
     def value(self, value: str):
-        if value == None: 
+        if value == None:
+            # может быть пустым
             super(Birthday, Birthday).value.__set__(self, None)
         else:
-            # DD.MM.YYYY, DD-MM-YYYY, DD/MM/YYYY 
+            # может быть пустым, поэтому не генерируем исключение
+            # допустимые форматы: DD.MM.YYYY, DD-MM-YYYY, DD/MM/YYYY 
             pattern = r"^\d{2}(\.|\-|\/)\d{2}\1\d{4}$"
             if re.match(pattern, value):
                 # заменяем слэши и дефисы на точки - приводим к одному формату
@@ -112,7 +116,8 @@ class Email(Field):
     
     @value.setter
     def value(self, value: str):
-        if value == None: 
+        if value == None:
+            # может быть пустым, поэтому не генерируем исключение 
             super(Email, Email).value.__set__(self, None)
         else:
             pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
