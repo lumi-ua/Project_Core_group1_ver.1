@@ -25,7 +25,8 @@ pipenv install pickleshare==0.7.5
 pipenv run python ./src/assistant.py
 ```
 
-### Create requirements:
+### Create requirements.txt:
+This necessary file required by Docker
 ```
 pipenv requirements > requirements.txt
 ```
