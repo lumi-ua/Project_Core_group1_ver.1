@@ -242,7 +242,7 @@ def func_exit(*args):
 @input_error
 def func_hello(*args):
     if len(args) > 0: print(*args[0])
-    return "Assistant, version 2.147"
+    return "Assistant, version 2.149"
 
 @input_error
 def no_command(*args):
@@ -390,7 +390,7 @@ def func_sort_files(*args):
 @input_error
 def show_help(*args):
     view.show_help()
-    return func_hello([])
+    return func_hello()
 
 @input_error
 def clear_screen(*args):
