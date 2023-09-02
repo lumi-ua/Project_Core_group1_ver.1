@@ -1,4 +1,4 @@
-## PythonCore-group1-v2
+## PythonCore-Assistant-v2
 CLI - Command Line Interface assistant
 
 ### Creating virtual environment:
