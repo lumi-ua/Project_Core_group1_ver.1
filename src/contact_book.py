@@ -67,6 +67,10 @@ class Phone(Field):
             else:
                 raise PhoneException("Incorrect phone format")
 
+def is_date(value: str):
+    # checked formats: DD.MM.YYYY, DD-MM-YYYY, DD/MM/YYYY 
+    pattern = r"^\d{2}(\.|\-|\/)\d{2}\1\d{4}$"
+    return re.match(pattern, value) != None
 
 class Birthday(Field):
     @property
@@ -80,9 +84,7 @@ class Birthday(Field):
             super(Birthday, Birthday).value.__set__(self, None)
         else:
             # может быть пустым, поэтому не генерируем исключение
-            # допустимые форматы: DD.MM.YYYY, DD-MM-YYYY, DD/MM/YYYY 
-            pattern = r"^\d{2}(\.|\-|\/)\d{2}\1\d{4}$"
-            if re.match(pattern, value):
+            if is_date(value):
                 # заменяем слэши и дефисы на точки - приводим к одному формату
                 result = re.sub("[-/]", ".", value)
                 super(Birthday, Birthday).value.__set__(self, result)

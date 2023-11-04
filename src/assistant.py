@@ -242,7 +242,7 @@ def func_exit(*args):
 @input_error
 def func_hello(*args):
     if len(args) > 0: print(*args[0])
-    return "Assistant, version 2.151"
+    return "Assistant, version 2.152"
 
 @input_error
 def no_command(*args):
