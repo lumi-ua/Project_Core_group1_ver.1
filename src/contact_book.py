@@ -69,7 +69,7 @@ class Phone(Field):
 
 def is_date(value: str):
     # checked formats: DD.MM.YYYY, DD-MM-YYYY, DD/MM/YYYY 
-    pattern = r"^\d{2}(\.|\-|\/)\d{2}\1\d{4}$"
+    pattern = r"^\d{1,2}(\.|\-|\/)\d{1,2}\1\d{4}$"
     return re.match(pattern, value) != None
 
 class Birthday(Field):
