@@ -8,16 +8,11 @@ pipenv --python 3.8.10
 ```
 Follow to add all packages versions from **pip list**:
 ```
+pipenv install django==4.2.8
+pipenv install matplotlib==3.7.1
+pipenv install scikit-learn==1.2.2
+pipenv install tensorflow==2.13.0
 pipenv install path==16.7.1
-```
-```
-pipenv install rich==13.5.2
-```
-```
-pipenv install pyreadline3==3.4.1
-```
-```
-pipenv install pickleshare==0.7.5
 ```
 
 ### Run app in environment:
