@@ -1,6 +1,6 @@
 
 from view import AbstractView
-from contact_book import AddressBook, Record, Name, Phone, Email, Birthday, Address, PhoneException, BirthdayException, EmailException
+from contact_book import AddressBook, Record, Name, Phone, Email, Birthday, Address
 from note_book import NoteBook
 
 from rich import print
@@ -13,14 +13,24 @@ class Rich_View(AbstractView):
 
    # вывод в консоль ноут-буки
    def show_note_book(self, note_book: NoteBook):
-      for note in note_book.data.values():
-         print(f"[{(len(note.tags))}] {note.key}: " + note.value)
-      for tag in note_book.tags.values():
-         print("[" + str(tag.sz()) + "]#" + tag.value)
+      if len(note_book.data) == 0: 
+         print("The database is empty")
+      else:
+         table = Table(box=box.DOUBLE)
+         table.add_column("ID", justify="left", no_wrap=True)
+         table.add_column("Note", justify="center", style="cyan", no_wrap=True)
+         table.add_column("Tags", justify="center", style="blue", no_wrap=True)
+         console = Console()
+         result = [table.add_row(
+               note.key,
+               str(note.value), 
+               str("---") if len(note.tags) == 0 else " ".join(["#" + tag for tag in note.tags])
+            ) for note in note_book.data.values()]
+         console.print(table)
 
    # вывод в консоль контакт-буки
    def show_contact_book(self, contact_book: AddressBook):
-      if len(contact_book.data) == 0: 
+      if len(contact_book.data) == 0:
          print("The database is empty")
       else: 
          table = Table(box=box.DOUBLE)
@@ -32,53 +42,70 @@ class Rich_View(AbstractView):
          
          console = Console()
          result = [table.add_row(
-               str(record.name.value), 
-               str(record.birthday.value if record.birthday else "---"), 
-               str(', '.join(map(lambda phone: phone.value, record.phones))), 
-               str(record.email.value    if record.email    else "---"), 
-               str(record.address.value  if record.address  else "---")
-                  ) for record in contact_book.data.values()]        
+               str(record.name),
+               str(record.birthday if record.birthday else "---"),
+               str(', '.join(map(lambda phone: phone.value, record.phones))),
+               str(record.email    if record.email    else "---"),
+               str(record.address  if record.address  else "---")
+            ) for record in contact_book.data.values()]
          console.print(table)
 
    # вывод в консоль хэлпа
    def show_help(self):
-         print("""[bold red]cls[/bold red] - очищення екрану від інформації
-[bold red]hello[/bold red] - вітання
-[bold red]good bye, close, exit[/bold red] - завершення програми
-[bold red]showall[/bold red] - друкування всієї наявної інформації про користувачів
-[bold red]show book /N[/bold red]  - друкування інформації посторінково, де [bold red]N[/bold red] - кількість записів на 1 сторінку
-[bold red]add[/bold red] - додавання користувача до бази даних. 
-      example >> [bold blue]add Mike 02.10.1990 +380504995876[/bold blue]
-            >> [bold blue]add Mike None +380504995876[/bold blue]
-            >> [bold blue]add Mike None None[/bold blue]
-[bold red]phone[/bold red] - повертає перелік телефонів для особи
-      example >> [bold blue]phone Mike[/bold blue]
-[bold red]add phone[/bold red] - додавання телефону для користувача
-      example >> [bold blue]add phone Mike +380504995876[/bold blue]
-[bold red]change phone[/bold red] - зміна номеру телефону для користувача
-      Формат запису телефону: [bold green]+38ХХХ ХХХ ХХ ХХ[/bold green]
-      example >> [bold blue]change phone Mike +380504995876 +380665554433[/bold blue]
-[bold red]del phone[/bold red] - видаляє телефон для особи. Дозволяється видаляти одразу декілька телефонів.
-      example >> [bold blue]del phone Mike +380509998877, +380732225566[/bold blue]
-[bold red]birthday[/bold red] - повертає кількість днів до Дня народження
-      example >> [bold blue]birthday Mike[/bold blue]
-[bold red]change birthday[/bold red] - змінює/додає Дату народження для особи
-      example >> [bold blue]change birthday Mike 02.03.1990[/bold blue]
-[bold red]search[/bold red] - виконує пошук інформації по довідковій книзі
-      example >> [bold blue]search Mike[/bold blue]
-[bold red]note add[/bold red] - додає нотатку з тегом у записник нотаток
-      example >> [bold blue]note add My first note Note[/bold blue]
-[bold red]note del[/bold red] - видаляє нотатку за ключем із записника нотаток
-      example >> [bold blue]note del 1691245959.0[/bold blue]
-[bold red]note change[/bold red] - змінює нотатку з тегом за ключем у записнику нотаток
-      example >> [bold blue]note change 1691245959.0 My first note Note[/bold blue]
-[bold red]note find[/bold red] - здійснює пошук за фрагментом у записнику нотаток
-      example >> [bold blue]note find name[/bold blue]
-[bold red]note show[/bold red] - здійснює посторінковий вивід всіх нотаток
-      example >> [bold blue]note show /10[/bold blue]
-[bold red]note sort[/bold red] - здійснює сортування записів нотаток за тегами
-      example >> [bold blue]note sort /10[/bold blue]      
+         print("""[bold red]cls[/bold red] - очищення консолі від тексту
+[bold red]hello[/bold red] - виводить стартове вітання
+[bold red]exit[/bold red] - завершення програми
+[bold red]showall[/bold red] - виводить всю наявну інформацію про всіх користувачів
+[bold red]userbook N[/bold red] - виводить інформацію про користувачів посторінково, де [bold red]N[/bold red] - кількість записів на 1 сторінку
+      example >> [bold blue]userbook 10[/bold blue]
+[bold red]user+[/bold red] - додавання нової особи до книги контактів
+      example >> [bold blue]user+ Mike 01.01.1990 380123456789 112233445566[/bold blue]
+      example >> [bold blue]user+ Mike 112233445566 380123456789[/bold blue]
+[bold red]user-[/bold red] - видалення запису вказаної особи з книги контактів
+      example >> [bold blue]user- Mike[/bold blue]
+[bold red]rename[/bold red] - перейменування запису вказаної особи 
+      example >> [bold blue]rename OldName NewName[/bold blue]
+[bold red]showuser[/bold red] - виводить повну інформацію про вказану особу
+      example >> [bold blue]showuser Mike[/bold blue]
+[bold red]phone+[/bold red] - додавання нового номеру телефона для вказаної особи
+      example >> [bold blue]phone+ Mike 380123456789[/bold blue]
+[bold red]phone*[/bold red] - зміна номеру телефону для вказаної особи (вказати старий номер та новий номер)
+      example >> [bold blue]phone* Mike 380123456789 112233445566[/bold blue]
+[bold red]phone-[/bold red] - видаляє телефон для вказаної особи
+      example >> [bold blue]phone- Mike 380123456789[/bold blue]
+[bold red]birthday[/bold red] - виводить список контактів, у яких день народження через задану кількість днів від поточної дати
+      example >> [bold blue]birthday 5[/bold blue]
+[bold red]edit-birthday[/bold red] - змінює/додає дату народження для вказаної особи
+      example >> [bold blue]edit-birthday Mike 01.01.1990[/bold blue]
+[bold red]edit-email[/bold red] - змінює/додає електронну адресу для вказаної особи
+      example >> [bold blue]edit-email Mike user@mail.com[/bold blue]
+[bold red]edit-address[/bold red] - змінює/додає географічну адресу для вказаної особи
+      example >> [bold blue]edit-address Mike geo-address[/bold blue]
+[bold red]user?[/bold red] - виконує пошук контактів за текстом по довідковій книзі
+      example >> [bold blue]user? Mike[/bold blue]
+      example >> [bold blue]user? 3809[/bold blue]
+[bold red]note+[/bold red] - додає нову нотатку в записнику нотаток
+      example >> [bold blue]note+ My first note text[/bold blue]
+[bold red]note-[/bold red] - видаляє нотатку із записника нотаток за вказаним ID нотатки
+      example >> [bold blue]note- 1[/bold blue]
+[bold red]note*[/bold red] - змінює текст нотатки за вказаним ID нотатки
+      example >> [bold blue]note* 1 My first note text[/bold blue]
+[bold red]note?[/bold red] - здійснює пошук нотаток за текстом
+      example >> [bold blue]note? text_in_note[/bold blue]
+[bold red]note#[/bold red] - здійснює пошук та сортування нотаток з текстом у ключових словах (використовується пейджинація)
+      example >> [bold blue]note# text_in_tag[/bold blue]
+[bold red]tag+[/bold red] - додає нові теги до нотатки за вказаним ID нотатки
+      example >> [bold blue]tag+ 1 tag0 tag1 tag2[/bold blue]
+[bold red]tag-[/bold red] - видаляє теги нотатки за вказаним ID нотатки. Якщо тег не вказаний, то видаляються всі теги вказаної нотатки
+      example >> [bold blue]tag- 1 tag0 tag1 tag2[/bold blue]
+      example >> [bold blue]tag- 1[/bold blue]
+[bold red]showtag[/bold red] - виводить всі нотатки, в яких є заданий тег
+      example >> [bold blue]showtag mytag[/bold blue]
+[bold red]shownote[/bold red] - виводить вміст нотатки за вказаним ID нотатки
+      example >> [bold blue]shownote 1[/bold blue]
+[bold red]notebook[/bold red] - виводить вміст всіх нотаток записника нотаток
+      example >> [bold blue]notebook[/bold blue]
 [bold red]sort[/bold red] - виконує сортування файлів в указаній папці
       example >> [bold blue]sort folder_name[/bold blue]
-""")
+[bold red]help[/bold red] - справочна інформація по всім командам""")
 

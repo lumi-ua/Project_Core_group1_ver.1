@@ -18,9 +18,9 @@ class EmailException(Exception):
 
 
 class Field():
-    def __init__(self, value) -> None:
+    def __init__(self, value):
         self.__value = None
-        self.value = value
+        self.value = value  #call setter of inheritor
     
     @property
     def value(self):
@@ -37,62 +37,64 @@ class Field():
 
     def __repr__(self) -> str:
         return str(self.value)
-    
-# клас Ім'я
+
 class Name(Field):
+    pass
+
+
+class Phone(Field):
     @property
     def value(self):
-        return self.__value
+        return super().value
     
     @value.setter
     def value(self, value):
-        self.__value = value
-
-
-# клас Телефон
-class Phone(Field): 
-    @property
-    def value(self):
-        return self.__value 
-    
-    @value.setter
-    def value(self, value):
-        if value == None: 
-            self.__value = value
+        if value == None:
+            # не может быть пустым, поэтому генерируем исключение
             raise PhoneException("Incorrect phone format: None")
         else:
-            correct_phone = ""
-            for i in value: 
-                if i in "+0123456789": correct_phone += i
+            # не может быть невалидным, поэтому генерируем искючение
+            correct_phone = re.match(r"(?:\+\d{2})?\d{9,10}", value, re.IGNORECASE)
+            if correct_phone:
+                phone = correct_phone.string
 
-            if len(correct_phone) == 13: self.__value = correct_phone # "+380123456789"
-            elif len(correct_phone) == 12: self.__value = "+" + correct_phone # "380123456789"
-            elif len(correct_phone) == 10: self.__value = "+38" + correct_phone # "0123456789"
-            elif len(correct_phone) == 9: self.__value = "+380" + correct_phone # "123456789"
-            else: raise PhoneException("Incorrect phone format")
+                if len(phone) == 13:   correct_phone = phone          # "+380123456789"
+                elif len(phone) == 12: correct_phone = "+" + phone    # "380123456789"
+                elif len(phone) == 10: correct_phone = "+38" + phone  # "0123456789"
+                elif len(phone) == 9:  correct_phone = "+380" + phone # "123456789"
+                else: raise PhoneException("Incorrect phone format!")
+                super(Phone, Phone).value.__set__(self, correct_phone)
+            else:
+                raise PhoneException("Incorrect phone format")
 
-    
-# клас День народження        
+def is_date(value: str):
+    # checked formats: DD.MM.YYYY, DD-MM-YYYY, DD/MM/YYYY 
+    pattern = r"^\d{1,2}(\.|\-|\/)\d{1,2}\1\d{4}$"
+    return re.match(pattern, value) != None
+
 class Birthday(Field):
     @property
     def value(self):
-        return self.__value
+        return super().value
     
     @value.setter
     def value(self, value: str):
-        if value == None: 
-            self.__value = None
+        if value == None:
+            # может быть пустым
+            super(Birthday, Birthday).value.__set__(self, None)
         else:
-            pattern = r"^\d{2}(\.|\-|\/)\d{2}\1\d{4}$"  # дозволені дати формату DD.MM.YYYY 
-            if re.match(pattern, value):         # альтернатива для крапки: "-" "/"
-                self.__value = re.sub("[-/]", ".", value)  # комбінувати символи ЗАБОРОНЕНО DD.MM-YYYY 
-            else: 
-                self.__value = None
+            # может быть пустым, поэтому не генерируем исключение
+            if is_date(value):
+                # заменяем слэши и дефисы на точки - приводим к одному формату
+                result = re.sub("[-/]", ".", value)
+                super(Birthday, Birthday).value.__set__(self, result)
+            else:
+                super(Birthday, Birthday).value.__set__(self, None)
                 # устанавливаем None - для валидации 
                 #raise BirthdayException("Unauthorized birthday format")
 
     # возвращает количество дней перед днём рождения
-    def days_to_birthday(self) -> int:
+    def days_to_birthday(self):
         if self.value:
             # возвращает количество дней до следующего дня рождения.
             # если положительное то др еще не наступил, если отрицательное то уже прошел
@@ -106,44 +108,34 @@ class Birthday(Field):
 
 
 class Address(Field):
-    @property
-    def value(self):
-        return self.__value
-    
-    @value.setter
-    def value(self, value: str):
-        self.__value = value
-  
+    pass
+
 
 class Email(Field):
     @property
     def value(self):
-        return self.__value
+        return super().value
     
     @value.setter
     def value(self, value: str):
-        if value == None: 
-            self.__value = None
+        if value == None:
+            # может быть пустым, поэтому не генерируем исключение 
+            super(Email, Email).value.__set__(self, None)
         else:
             pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
             if not re.match(pattern, value):
                 raise EmailException("Invalid email address!")
             else:
-                self.__value = value
-      
+                super(Email, Email).value.__set__(self, value)
 
-#========================================================
-# Класс Record, который отвечает за логику 
-#  - добавления/удаления/редактирования
-# необязательных полей и хранения обязательного поля Name
-#=========================================================
+
 class Record():
-    def __init__(self, name:Name, phones: list, email: Email=None, birthday: Birthday=None, address: Address=None) -> None:
+    def __init__(self, name: Name, phones: list, email: Email=None, birthday: Birthday=None, address: Address=None):
         self.name = name
         self.email = email
         self.birthday = birthday
         self.address = address
-        self.phones = []            
+        self.phones = []
         self.phones.extend(phones)
 
 
@@ -174,22 +166,19 @@ class Record():
     def __str__(self) -> str:
         result = f"{', '.join(map(lambda phone: phone.value, self.phones))}"
         if self.birthday != None:
-            result = f"{self.birthday.value} | " + result
+            result = f"{self.birthday} | " + result
         if self.email != None:
-            result = f"{self.email.value} | " + result
+            result = f"{self.email} | " + result
         if self.address != None:
-            result = f"{self.address.value} | " + result
+            result = f"{self.address} | " + result
 
-        return f"{self.name.value} | " + result
+        return f"{self.name} | " + result
 
 
-    # Done - розширюємо існуючий список телефонів особи - Done
-    # НОВИМ телефоном або декількома телефонами для особи - Done
     def add_phone(self, list_phones) -> str:
         self.phones.extend(list_phones)
-        return f"The phones was/were added successfully"
+        return f"Phone-numbers was added successfully"
     
-    # Done - видаляємо телефони із списку телефонів особи - Done!
     def del_phone(self, del_phone: Phone) -> str:
         error = True
         for phone in self.phones:
@@ -201,18 +190,17 @@ class Record():
         if error: return f"Entered incorrect phone number."
         else: return f"The phone {phone.value} was deleted successfully"
     
-    # Done = редагування запису(телефону) у книзі особи - Done
     def edit_phone(self, old_phone: Phone, new_phone: Phone) -> str:
         index = next((i for i, obj in enumerate(self.phones) if obj.value == old_phone.value), -1)
         self.phones[index]= new_phone
         return f"User set new phone-number successfully"
-    
-    
-    # перевіряє наявність 1(одного)телефону у списку
-    def check_dublicate_phone(self, search_phone: str) ->bool:  
+
+
+    def check_dublicate_phone(self, search_phone: str) ->bool:
         result = list(map(lambda phone: any(phone.value == search_phone), self.data[self.name.value].phones))
         return True if result else False
-    
+
+
 class AddressBook(UserDict):
 
     def search(self, text):
@@ -225,7 +213,6 @@ class AddressBook(UserDict):
                 if phone.value.find(text.lower()) >= 0:
                     result.append(rec)
                     break
-
         return result
 
     def get_list_birthday(self, count_day: int):
@@ -249,24 +236,20 @@ class AddressBook(UserDict):
         self.data[new_name] = rec
         return f"successfully renamed from:{old_name} to:{new_name}"
     
-    # завантаження записів книги із файлу
-    def load_database(self, path):
+    def load_file(self, path):
         if path.exists():
             with open(path, "rb") as fr_bin:
-                self.data = pickle.load(fr_bin) # копирование Словника   load_data = pickle.load(fr_bin)
-                                                # self.data = {**load_data}
+                self.data = pickle.load(fr_bin)
+                # load_data = pickle.load(fr_bin)
+                # self.data = {**load_data}
             return f"The database has been loaded = {len(self.data)} records"
         return ""
     
-    #-----------------------------------------
-    # збереження записів книги у файл
-    #-------------------------------------------
     def save_database(self, path):
         with open(path, "wb") as f_out:
             pickle.dump(self.data, f_out)
-        return f"The database is saved = {len(self.data)} records"    
+        return f"The database is saved = {len(self.data)} records"
             
-    # генератор посторінкового друку
     def _record_generator(self, N=10):
         records = list(self.data.values())
         total_records = len(records)

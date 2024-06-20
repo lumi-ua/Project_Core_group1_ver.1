@@ -7,18 +7,18 @@ from contact_book import AddressBook, Record, Name, Phone, Email, Birthday, Addr
 from clean import sort_main
 from note_book import NoteBook
 from console_view import Console_View
+from rich_view import Rich_View
 import readline
 
 path_book = Path(sys.path[0]).joinpath("user_book.bin")
 path_note = Path(sys.path[0]).joinpath("note_book.bin")
 
-view = Console_View()
+view = Rich_View()
 book = AddressBook()
 note_book = NoteBook()
 
 class ArgsAmountException(Exception):
    """Wrong arguments amount exception"""
-        
 
 def input_error(func):
     def wrapper(*args):
@@ -47,7 +47,7 @@ def input_error(func):
     return wrapper
 
 #=========================================================
-# >> note+ My first note in this bot.
+# >> note+ My first text of note
 #=========================================================
 @input_error
 def note_add(args):
@@ -76,7 +76,7 @@ def del_tags(args: str):
     else: return ""
 
 #=========================================================
-# >> note-del <key>
+# >> note- <key>
 #=========================================================
 @input_error
 def note_del(args):
@@ -86,7 +86,7 @@ def note_del(args):
     else: raise ArgsAmountException("Wrong arguments amount. Expected 1 argument")
 
 #=========================================================
-# >> note-change <key> <Text>
+# >> note* <key> <Text>
 #=========================================================
 @input_error
 def note_change(args):
@@ -100,22 +100,8 @@ def note_change(args):
         else: raise TypeError("Note.key wrong type")
     else: raise ArgsAmountException("Unknown argument error")
 
-
 #=========================================================
-# >> note-find <text-fragment>
-#=========================================================
-@input_error
-def notes_find(args):
-    notes_list = note_book.find_notes(args.strip())
-    if notes_list:
-        return f"Search result in notes: \n{str(notes_list)}"
-    else:
-        return f"No one notes was found for fragment: '{args}'"
-
-
-#=========================================================
-# >> note-show <int: необов'язковий аргумент кількості рядків>
-# example >> note show 15
+# >> shownote <key>
 #=========================================================
 @input_error
 def show_note(args):
@@ -126,8 +112,11 @@ def show_note(args):
         return ""
     else: raise ArgsAmountException("Wrong arguments amount. Expected 1 argument")
 
+#=========================================================
+# >> showtag <tag>
+#=========================================================
 @input_error
-def tag_show(args):
+def show_tag(args):
     params = args.strip().split()
     if len(params) == 1:
         tag_key = params[0]
@@ -137,8 +126,19 @@ def tag_show(args):
     return ""
 
 #=========================================================
-# >> n-search <text>
-# пошук та сортування нотаток за ключовими словами
+# >> note? <text>
+#=========================================================
+@input_error
+def notes_search(args):
+    notes_list = note_book.find_notes(args.strip())
+    if notes_list:
+        return f"Search result in notes: \n{str(notes_list)}"
+    else:
+        return f"No one notes was found for fragment: '{args}'"
+
+#=========================================================
+# >> note# <text>
+# пошук та сортування нотаток за текстом в ключових словах
 #=========================================================
 @input_error
 def notes_tag_search(args):
@@ -156,14 +156,16 @@ def notes_tag_search(args):
             count = 0
     return ""
 
+#=========================================================
+# >> notebook
+#=========================================================
 @input_error
 def show_note_book(args):
     view.show_note_book(note_book=note_book)
     return ""
 
 #=========================================================
-# Создаёт новый контакт
-# example >> add Mike 02.10.1990 +380504995876
+# example >> user+ Mike 01.10.1990 +112233445566
 #=========================================================
 @input_error
 def func_new_user(*args):
@@ -190,35 +192,37 @@ def func_new_user(*args):
         else: return "The person is already in database"
     else: raise ArgsAmountException("Wrong arguments amount. Expected 3 arguments")
      
-
+#=========================================================
+# >> showall
+#=========================================================
 @input_error
-def show_contact_book(*args)->str:
+def show_contact_book(*args):
     view.show_contact_book(contact_book=book)
     return ""
 
 #=========================================================
-# >> show-book /N
-# друкує книгу контактів по N записів
-# де N - це кількість записів на одній сторінці
+# >> userbook N
+# друкує книгу контактів по N записів, якщо без параметру - то по одному запису
 #=========================================================
 @input_error
 def func_book_pages(*args):
-    n = int(re.sub("\D", "", args[0]))
+    n = 1
+    if (len(args) == 1): n = int(re.sub("\D", "", args[0]))
     n_page = 0
     for batch in book._record_generator(N=n):
         n_page += 1
-        print(f"{'='*14} Page #{n_page} {'='*16}")
+        print(f"{'='*15} Page #{n_page} {'='*16}")
         for record in batch:
             print(str(record))
-        print("="*40)    
-        print("Press Enter", end="")
+        if len(batch) < n: break
+        print("="*40)
+        print("Press Enter ", end="")
         input("to continue next page...")
-    return f"End of the ContactBook" 
+    return f"End of the ContactBook"
 
 
 #=========================================================
-# Изменяет номер телефона
-# >> change-phone Mike +38099 +38050777
+# >> phone* Mike +112233445566 +380123456789
 #=========================================================
 @input_error 
 def func_change_phone(*args):
@@ -226,7 +230,6 @@ def func_change_phone(*args):
         name = args[0].capitalize()
         return book[name].edit_phone(Phone(args[1]), Phone(args[2]))
     else: raise ArgsAmountException("Wrong arguments amount. Expected 3 arguments")
-
 
 @input_error
 def func_exit(*args):
@@ -238,15 +241,15 @@ def func_exit(*args):
 
 @input_error
 def func_hello(*args):
-    return "How can I help you?"
+    if len(args) > 0: print(*args[0])
+    return "Assistant, version 2.152"
 
 @input_error
 def no_command(*args):
-    print("Unknown command")
-    return func_hello(args=args)
+    return func_hello(["Unknown command"])
 
 #=========================================================
-# >> phone <username>
+# >> showuser <username>
 #=========================================================
 @input_error
 def show_user(*args):
@@ -256,9 +259,8 @@ def show_user(*args):
         return ""
     else: raise ArgsAmountException('Wrong arguments amount. Missed "Name" of the person')
 
-
 #========================================================= 
-# >> add-phone Mike +380509998877 +380732225566
+# >> phone+ Mike +380123456789 +112233445566
 #=========================================================
 @input_error
 def func_add_phone(*args):
@@ -268,9 +270,8 @@ def func_add_phone(*args):
         return book[name].add_phone([Phone(phone) for phone in phones])
     else: raise ArgsAmountException("Wrong arguments amount. Expected 2 arguments")
 
-
 #=========================================================  
-# >> change-birthday Mike 12.05.1990
+# >> edit-birthday Mike 01.01.1990
 #=========================================================
 @input_error
 def func_change_birthday(*args):
@@ -306,14 +307,14 @@ def func_list_birthday(*args):
     return ""
 
 #=========================================================
-# видаляє телефон або список телефонів в існуючому записі особи Mike   
-# >> del phone Mike +380509998877 +380732225566
+# видаляє телефон в існуючому записі особи   
+# >> phone- Mike +112233445566
 #=========================================================  
 @input_error 
 def func_del_phone(*args):
     if (len(args) == 2):
         name = args[0].capitalize()
-        # формуємо список  об'єктів Phone, тому що на майбутнє хочу реалізувати видалення декількох телефонів 
+        # формуємо список об'єктів Phone, на майбутнє реалізувати видалення декількох телефонів 
         #lst_del_phones = list(map(lambda phone: Phone(phone), args)) 
         return book[name].del_phone(Phone(args[1]))
     else: raise ArgsAmountException("Wrong arguments amount. Expected 2 arguments")
@@ -354,9 +355,8 @@ def func_del_address(*args):
     else: raise ArgsAmountException("Wrong arguments amount. Expected 1 arguments")
 
 #=========================================================
-# функція виконує пошук інформації у довідковій книзі
-#              example >> search Mike
-#                      >> search 38073
+# >> search Mike
+# >> search 3809
 #=========================================================
 @input_error
 def func_search(*args):
@@ -390,12 +390,11 @@ def func_sort_files(*args):
 @input_error
 def show_help(*args):
     view.show_help()
-    return ""
+    return func_hello()
 
 @input_error
 def clear_screen(*args):
     os_name = platform.system().lower()
-    
     if os_name == 'windows':
         os.system('cls')
     elif os_name == 'linux' or os_name == 'darwin':
@@ -406,37 +405,37 @@ def clear_screen(*args):
 COMMANDS = {
     func_exit: ("exit", "end", "bye",),
     func_hello: ("hello", "hy", "welcome",),
-    func_new_user: ("user+", "add+", "add-user", "new", ),
+    func_new_user: ("user+", "add-user",),
+    func_del_user: ("user-", "del-user",),
     func_rename_user: ("rename",),
-    func_del_user: ("user-", "del-user", "delete-user", ),
     func_add_phone: ("phone+", "add-phone", "add_phone",),
     func_del_phone: ("phone-", "del-phone", "del_phone"),
+    func_change_phone: ("phone*", "edit-phone", "change-phone",),
     func_del_birthday: ("del-birthday", "del_birthday"),
     func_del_email: ("del-email", "del_email"),
     func_del_address: ("del-address", "del_address"),
-    func_change_phone: ("edit-phone", "change-phone", "change_phone"),
-    func_book_pages: ("show-book", "show_book", "showbook"),
+    func_book_pages: ("userbook", "showbook"),
     func_change_birthday: ("edit-birthday", "edit_birthday"),
     func_change_email: ("edit-email", "edit_email"),
     func_change_address: ("edit-address", "edit_address"),
     func_list_birthday: ("birthday",),
-    func_search: ("search", "find", "seek"),
+    func_search: ("user?", "search",),
     func_sort_files: ("sort",),
     show_user: ("showuser",),
-    show_contact_book: ("showall", "show-all", "userbook",),
+    show_contact_book: ("showall", "show-all",),
     show_help: ("help", "?",),
 }
 
 COMMANDS_NOTES = {
-    note_add: ("note+", "note_add", "note-add", ),
-    note_del: ("note_del", "note-del",),
-    note_change: ("note_change", "note-change",),
-    notes_find: ("note_find", "note-find",),
-    notes_tag_search: ("n-search",),
-    add_tags: ("tags+", "add_tags", "add-tags",),
-    del_tags: ("tags-", "del_tags", "del-tags",),
-    tag_show: ("tag-show", "tag_show",),
-    show_note: ("shownote", "show-note",),
+    note_add:   ("note+",   "add-note",),
+    note_del:   ("note-",   "del-note",),
+    note_change:("note*",   "edit-note",),
+    notes_search: ("note?",  "search-note",),
+    notes_tag_search: ("note#",),
+    add_tags:   ("tags+",   "add_tags", "add-tags",),
+    del_tags:   ("tags-",   "del_tags", "del-tags",),
+    show_tag:   ("showtag", "show-tag",),
+    show_note:  ("shownote", "show-note",),
     show_note_book: ("notebook",),
 }
 
@@ -455,11 +454,6 @@ def complete(text, state):
                     results.append(kwd)
     results.append(None)
     return results[state]
-################################################################
-# set and bind autocomplete function 
-readline.parse_and_bind("tab: complete")
-readline.set_completer(complete)
-################################################################
 
 def parser(text: str):
     for cmd, kwds in COMMANDS.items():
@@ -480,7 +474,7 @@ def parser(text: str):
 def main():
     global path_book
     global path_note
-    book.load_database(path_book)
+    book.load_file(path_book)
     note_book.load_file(path_note)
 
     while True:
@@ -494,4 +488,7 @@ def main():
         if result: print(result)
 ################################################################
 if __name__ == "__main__":
+    # set and bind autocomplete function 
+    readline.parse_and_bind("tab: complete")
+    readline.set_completer(complete)
     main()
