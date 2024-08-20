@@ -9,10 +9,15 @@ pipenv --python 3.8.10
 Follow to add all packages versions from **pip list**:
 ```
 pipenv install django==4.2.8
-pipenv install matplotlib==3.7.1
+pipenv install python-dotenv==1.0.1
+pipenv install django-environ==0.11.2
+pipenv install numpy==1.23.5
+pipenv install pandas==2.0.2
 pipenv install scikit-learn==1.2.2
-pipenv install tensorflow==2.13.0
+pipenv install pybind11==2.10.4
+pipenv install matplotlib==3.7.1
 pipenv install path==16.7.1
+pipenv install tensorflow==2.13.0
 ```
 
 ### Run app in environment:
